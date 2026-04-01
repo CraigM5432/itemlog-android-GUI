@@ -24,14 +24,17 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.craigmurphy.itemlog.viewmodel.LoginViewModel
 
 @Composable
 fun LoginScreen(
     onLoginClick: () -> Unit,
     onRegisterClick: () -> Unit
 ) {
-    var email by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val viewModel: LoginViewModel = viewModel()
 
     Scaffold(
         topBar = {
@@ -52,9 +55,9 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") },
+                value = username,
+                onValueChange = { username = it },
+                label = { Text("Username") },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -68,13 +71,25 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            viewModel.errorMessage.value?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = onLoginClick,
+                onClick = {
+                    viewModel.login(username, password) {
+                        onLoginClick()
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Login")
+                Text(if (viewModel.isLoading.value) "Loading..." else "Login")
             }
 
             Spacer(modifier = Modifier.height(12.dp))
