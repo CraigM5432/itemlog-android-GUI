@@ -17,29 +17,30 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
-
-data class ItemUiModel(
-    val id: Int,
-    val name: String,
-    val price: Double,
-    val quantity: Int
-)
+import com.craigmurphy.itemlog.viewmodel.ItemsViewModel
 
 @Composable
 fun ItemsScreen(
-    onAddItemClick: () -> Unit,
-    onRecordSaleClick: () -> Unit,
-    onTransactionsClick: () -> Unit
+    eventId: Long,
+    onAddItemClick: (Long) -> Unit,
+    onRecordSaleClick: (Long) -> Unit,
+    onTransactionsClick: (Long) -> Unit
 ) {
-    val items = listOf(
-        ItemUiModel(1, "T-Shirt", 20.0, 15),
-        ItemUiModel(2, "Hoodie", 35.0, 8),
-        ItemUiModel(3, "Cap", 15.0, 20)
-    )
+    val viewModel: ItemsViewModel = viewModel()
+
+    LaunchedEffect(eventId) {
+        viewModel.loadItems(eventId)
+    }
+
+    val items = viewModel.items.value
+    val isLoading = viewModel.isLoading.value
+    val errorMessage = viewModel.errorMessage.value
 
     Scaffold(
         topBar = {
@@ -57,14 +58,14 @@ fun ItemsScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Button(
-                    onClick = onAddItemClick,
+                    onClick = { onAddItemClick(eventId) },
                     modifier = Modifier.weight(1f)
                 ) {
                     Text("Add Item")
                 }
 
                 Button(
-                    onClick = onRecordSaleClick,
+                    onClick = { onRecordSaleClick(eventId) },
                     modifier = Modifier.weight(1f)
                 ) {
                     Text("Record Sale")
@@ -74,7 +75,7 @@ fun ItemsScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedButton(
-                onClick = onTransactionsClick,
+                onClick = { onTransactionsClick(eventId) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("View Transactions")
@@ -86,23 +87,44 @@ fun ItemsScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(items) { item ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth()
+            when {
+                isLoading -> {
+                    Text("Loading items...")
+                }
+
+                errorMessage != null -> {
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+
+                items.isEmpty() -> {
+                    Text("No items found.")
+                }
+
+                else -> {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            Text(
-                                text = item.name,
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(text = "Price: €${item.price}")
-                            Text(text = "Stock: ${item.quantity}")
+                        items(items) { item ->
+                            Card(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(16.dp)
+                                ) {
+                                    Text(
+                                        text = item.name,
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(text = "Price: €${item.price}")
+                                    Text(text = "Stock: ${item.quantity}")
+                                    Text(text = "Size: ${item.size ?: "N/A"}")
+                                    Text(text = "Description: ${item.description ?: "N/A"}")
+                                }
+                            }
                         }
                     }
                 }

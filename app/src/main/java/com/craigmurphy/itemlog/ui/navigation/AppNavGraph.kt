@@ -1,9 +1,11 @@
 package com.craigmurphy.itemlog.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.craigmurphy.itemlog.ui.screens.AddItemScreen
 import com.craigmurphy.itemlog.ui.screens.CreateEventScreen
 import com.craigmurphy.itemlog.ui.screens.EventsScreen
@@ -47,7 +49,7 @@ fun AppNavGraph() {
                     navController.navigate(Routes.CREATE_EVENT)
                 },
                 onEventClick = { eventId ->
-                    navController.navigate(Routes.ITEMS)
+                    navController.navigate(Routes.itemsRoute(eventId))
                 }
             )
         }
@@ -63,21 +65,30 @@ fun AppNavGraph() {
             )
         }
 
-        composable(Routes.ITEMS) {
+        composable(
+            route = Routes.ITEMS,
+            arguments = listOf(navArgument("eventId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getLong("eventId") ?: 0L
+
             ItemsScreen(
-                onAddItemClick = {
-                    navController.navigate(Routes.ADD_ITEM)
+                eventId = eventId,
+                onAddItemClick = { id ->
+                    navController.navigate(Routes.addItemRoute(id))
                 },
-                onRecordSaleClick = {
-                    navController.navigate(Routes.RECORD_SALE)
+                onRecordSaleClick = { id ->
+                    navController.navigate(Routes.recordSaleRoute(id))
                 },
-                onTransactionsClick = {
-                    navController.navigate(Routes.TRANSACTIONS)
+                onTransactionsClick = { id ->
+                    navController.navigate(Routes.transactionsRoute(id))
                 }
             )
         }
 
-        composable(Routes.ADD_ITEM) {
+        composable(
+            route = Routes.ADD_ITEM,
+            arguments = listOf(navArgument("eventId") { type = NavType.LongType })
+        ) {
             AddItemScreen(
                 onSaveClick = {
                     navController.popBackStack()
@@ -88,7 +99,10 @@ fun AppNavGraph() {
             )
         }
 
-        composable(Routes.RECORD_SALE) {
+        composable(
+            route = Routes.RECORD_SALE,
+            arguments = listOf(navArgument("eventId") { type = NavType.LongType })
+        ) {
             RecordSaleScreen(
                 onSaveClick = {
                     navController.popBackStack()
@@ -99,7 +113,10 @@ fun AppNavGraph() {
             )
         }
 
-        composable(Routes.TRANSACTIONS) {
+        composable(
+            route = Routes.TRANSACTIONS,
+            arguments = listOf(navArgument("eventId") { type = NavType.LongType })
+        ) {
             TransactionsScreen()
         }
     }
