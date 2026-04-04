@@ -4,6 +4,8 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import android.content.Context
+import com.craigmurphy.itemlog.data.local.TokenManager
 
 object RetrofitClient {
 
@@ -13,14 +15,28 @@ object RetrofitClient {
         level = HttpLoggingInterceptor.Level.BODY
     }
 
-    private val okHttpClient = OkHttpClient.Builder()
-        .addInterceptor(loggingInterceptor)
-        .build()
+    private fun getClient(context: Context): OkHttpClient {
+        val tokenManager = TokenManager(context)
 
-    val apiService: ApiService by lazy {
-        Retrofit.Builder()
+        return OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                val requestBuilder = chain.request().newBuilder()
+
+                val token = tokenManager.getToken()
+                if (token != null) {
+                    requestBuilder.addHeader("Authorization", "Bearer $token")
+                }
+
+                chain.proceed(requestBuilder.build())
+            }
+            .addInterceptor(loggingInterceptor)
+            .build()
+    }
+
+    fun create(context: Context): ApiService {
+        return Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(okHttpClient)
+            .client(getClient(context))
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)

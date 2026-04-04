@@ -5,10 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.craigmurphy.itemlog.data.repository.AuthRepository
 import kotlinx.coroutines.launch
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import com.craigmurphy.itemlog.data.local.TokenManager
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository = AuthRepository()
+    private val repository = AuthRepository(application)
+    private val tokenManager = TokenManager(application)
 
     var isLoading = mutableStateOf(false)
     var errorMessage = mutableStateOf<String?>(null)
@@ -27,6 +31,10 @@ class LoginViewModel : ViewModel() {
             isLoading.value = false
 
             if (result.isSuccess) {
+                val token = result.getOrNull()?.token
+                if (token != null) {
+                    tokenManager.saveToken(token)
+                }
                 onSuccess()
             } else {
                 errorMessage.value = result.exceptionOrNull()?.message
