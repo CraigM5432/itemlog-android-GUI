@@ -21,8 +21,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
+import com.craigmurphy.itemlog.viewmodel.CreateEventViewModel
 
 @Composable
 fun CreateEventScreen(
@@ -31,6 +33,8 @@ fun CreateEventScreen(
 ) {
     var eventName by remember { mutableStateOf("") }
     var eventDate by remember { mutableStateOf("") }
+
+    val viewModel: CreateEventViewModel = viewModel()
 
     Scaffold(
         topBar = {
@@ -65,13 +69,25 @@ fun CreateEventScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            viewModel.errorMessage.value?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = onSaveClick,
+                onClick = {
+                    viewModel.createEvent(eventName, eventDate) {
+                        onSaveClick()
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Save Event")
+                Text(if (viewModel.isLoading.value) "Saving..." else "Save Event")
             }
 
             Spacer(modifier = Modifier.height(12.dp))
