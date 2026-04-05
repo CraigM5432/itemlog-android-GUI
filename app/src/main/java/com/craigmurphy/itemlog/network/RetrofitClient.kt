@@ -1,11 +1,11 @@
 package com.craigmurphy.itemlog.network
 
+import android.content.Context
+import com.craigmurphy.itemlog.data.local.TokenManager
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import android.content.Context
-import com.craigmurphy.itemlog.data.local.TokenManager
 
 object RetrofitClient {
 
@@ -20,11 +20,17 @@ object RetrofitClient {
 
         return OkHttpClient.Builder()
             .addInterceptor { chain ->
-                val requestBuilder = chain.request().newBuilder()
+                val originalRequest = chain.request()
+                val requestBuilder = originalRequest.newBuilder()
 
-                val token = tokenManager.getToken()
-                if (token != null) {
-                    requestBuilder.addHeader("Authorization", "Bearer $token")
+                val path = originalRequest.url.encodedPath
+
+                // NOT attaching token to public auth endpoints
+                if (!path.startsWith("/auth/")) {
+                    val token = tokenManager.getToken()
+                    if (!token.isNullOrBlank()) {
+                        requestBuilder.addHeader("Authorization", "Bearer $token")
+                    }
                 }
 
                 chain.proceed(requestBuilder.build())
