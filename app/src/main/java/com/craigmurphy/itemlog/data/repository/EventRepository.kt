@@ -6,6 +6,8 @@ import com.craigmurphy.itemlog.data.model.EventResponse
 import com.craigmurphy.itemlog.network.RetrofitClient
 import com.craigmurphy.itemlog.data.model.ItemResponse
 import com.craigmurphy.itemlog.data.model.CreateItemRequest
+import com.craigmurphy.itemlog.data.model.CreateTransactionRequest
+import com.craigmurphy.itemlog.data.model.TransactionResponse
 
 class EventRepository(private val context: Context) {
 
@@ -58,6 +60,27 @@ class EventRepository(private val context: Context) {
                     size = size,
                     quantity = quantity,
                     description = description
+                )
+            )
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun createTransaction(
+        eventId: Long,
+        itemId: Long,
+        quantitySold: Int,
+        salePrice: Double
+    ): Result<TransactionResponse> {
+        return try {
+            val response = RetrofitClient.create(context).createTransaction(
+                eventId = eventId,
+                request = CreateTransactionRequest(
+                    itemId = itemId,
+                    quantitySold = quantitySold,
+                    salePrice = salePrice
                 )
             )
             Result.success(response)

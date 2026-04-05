@@ -107,8 +107,11 @@ fun AppNavGraph() {
         composable(
             route = Routes.RECORD_SALE,
             arguments = listOf(navArgument("eventId") { type = NavType.LongType })
-        ) {
+        ) { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getLong("eventId") ?: 0L
+
             RecordSaleScreen(
+                eventId = eventId,
                 onSaveClick = {
                     navController.popBackStack()
                 },
