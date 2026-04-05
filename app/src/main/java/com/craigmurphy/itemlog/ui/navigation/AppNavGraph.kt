@@ -36,7 +36,9 @@ fun AppNavGraph() {
 
         composable(Routes.REGISTER) {
             RegisterScreen(
-                onRegisterClick = { },
+                onRegisterClick = {
+                    navController.popBackStack()
+                },
                 onBackClick = {
                     navController.popBackStack()
                 }
@@ -88,8 +90,11 @@ fun AppNavGraph() {
         composable(
             route = Routes.ADD_ITEM,
             arguments = listOf(navArgument("eventId") { type = NavType.LongType })
-        ) {
+        ) { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getLong("eventId") ?: 0L
+
             AddItemScreen(
+                eventId = eventId,
                 onSaveClick = {
                     navController.popBackStack()
                 },

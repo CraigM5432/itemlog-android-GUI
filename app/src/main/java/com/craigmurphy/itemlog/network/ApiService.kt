@@ -9,6 +9,7 @@ import com.craigmurphy.itemlog.data.model.LoginRequest
 import com.craigmurphy.itemlog.data.model.LoginResponse
 import com.craigmurphy.itemlog.data.model.MessageResponse
 import com.craigmurphy.itemlog.data.model.RegisterRequest
+import com.craigmurphy.itemlog.data.model.RegisterResponse
 import com.craigmurphy.itemlog.data.model.TransactionResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -25,7 +26,7 @@ interface ApiService {
     @POST("auth/register")
     suspend fun register(
         @Body request: RegisterRequest
-    ): MessageResponse
+    ): RegisterResponse
 
     @GET("events")
     suspend fun getEvents(): List<EventResponse>

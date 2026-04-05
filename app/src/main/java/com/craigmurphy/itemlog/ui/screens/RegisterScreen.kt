@@ -20,10 +20,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
+import com.craigmurphy.itemlog.viewmodel.RegisterViewModel
 
 @Composable
 fun RegisterScreen(
@@ -33,6 +34,8 @@ fun RegisterScreen(
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val viewModel: RegisterViewModel = viewModel()
 
     Scaffold(
         topBar = {
@@ -73,17 +76,28 @@ fun RegisterScreen(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Password") },
-                visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth()
             )
+
+            viewModel.errorMessage.value?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = onRegisterClick,
+                onClick = {
+                    viewModel.register(username, email, password) {
+                        onRegisterClick()
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Register")
+                Text(if (viewModel.isLoading.value) "Registering..." else "Register")
             }
 
             Spacer(modifier = Modifier.height(12.dp))

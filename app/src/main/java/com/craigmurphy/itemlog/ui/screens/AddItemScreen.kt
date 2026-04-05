@@ -21,11 +21,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
+import com.craigmurphy.itemlog.viewmodel.AddItemViewModel
 
 @Composable
 fun AddItemScreen(
+    eventId: Long,
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
@@ -34,6 +37,8 @@ fun AddItemScreen(
     var quantity by remember { mutableStateOf("") }
     var size by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+
+    val viewModel: AddItemViewModel = viewModel()
 
     Scaffold(
         topBar = {
@@ -95,13 +100,32 @@ fun AddItemScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            viewModel.errorMessage.value?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = onSaveClick,
+                onClick = {
+                    viewModel.createItem(
+                        eventId = eventId,
+                        name = itemName,
+                        price = price,
+                        size = size,
+                        quantity = quantity,
+                        description = description
+                    ) {
+                        onSaveClick()
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Save Item")
+                Text(if (viewModel.isLoading.value) "Saving..." else "Save Item")
             }
 
             Spacer(modifier = Modifier.height(12.dp))
