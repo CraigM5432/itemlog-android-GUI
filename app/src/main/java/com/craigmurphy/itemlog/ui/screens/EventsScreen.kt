@@ -26,12 +26,13 @@ import com.craigmurphy.itemlog.viewmodel.EventsViewModel
 
 @Composable
 fun EventsScreen(
+    refreshTrigger: Boolean,
     onCreateEventClick: () -> Unit,
     onEventClick: (Long) -> Unit
 ) {
     val viewModel: EventsViewModel = viewModel()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(refreshTrigger) {
         viewModel.loadEvents()
     }
 

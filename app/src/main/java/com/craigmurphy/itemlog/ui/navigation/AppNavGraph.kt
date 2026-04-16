@@ -45,12 +45,18 @@ fun AppNavGraph() {
             )
         }
 
-        composable(Routes.EVENTS) {
+        composable(Routes.EVENTS) { backStackEntry ->
+            val refreshEvents =
+                backStackEntry.savedStateHandle.get<Boolean>("refresh_events") ?: false
+
             EventsScreen(
+                refreshTrigger = refreshEvents,
                 onCreateEventClick = {
+                    backStackEntry.savedStateHandle["refresh_events"] = false
                     navController.navigate(Routes.CREATE_EVENT)
                 },
                 onEventClick = { eventId ->
+                    backStackEntry.savedStateHandle["refresh_events"] = false
                     navController.navigate(Routes.itemsRoute(eventId))
                 }
             )
@@ -59,6 +65,9 @@ fun AppNavGraph() {
         composable(Routes.CREATE_EVENT) {
             CreateEventScreen(
                 onSaveClick = {
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("refresh_events", true)
                     navController.popBackStack()
                 },
                 onCancelClick = {
@@ -72,16 +81,22 @@ fun AppNavGraph() {
             arguments = listOf(navArgument("eventId") { type = NavType.LongType })
         ) { backStackEntry ->
             val eventId = backStackEntry.arguments?.getLong("eventId") ?: 0L
+            val refreshItems =
+                backStackEntry.savedStateHandle.get<Boolean>("refresh_items") ?: false
 
             ItemsScreen(
                 eventId = eventId,
+                refreshTrigger = refreshItems,
                 onAddItemClick = { id ->
+                    backStackEntry.savedStateHandle["refresh_items"] = false
                     navController.navigate(Routes.addItemRoute(id))
                 },
                 onRecordSaleClick = { id ->
+                    backStackEntry.savedStateHandle["refresh_items"] = false
                     navController.navigate(Routes.recordSaleRoute(id))
                 },
                 onTransactionsClick = { id ->
+                    backStackEntry.savedStateHandle["refresh_items"] = false
                     navController.navigate(Routes.transactionsRoute(id))
                 }
             )
@@ -96,6 +111,9 @@ fun AppNavGraph() {
             AddItemScreen(
                 eventId = eventId,
                 onSaveClick = {
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("refresh_items", true)
                     navController.popBackStack()
                 },
                 onCancelClick = {
@@ -113,6 +131,9 @@ fun AppNavGraph() {
             RecordSaleScreen(
                 eventId = eventId,
                 onSaveClick = {
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("refresh_items", true)
                     navController.popBackStack()
                 },
                 onCancelClick = {

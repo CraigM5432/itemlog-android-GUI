@@ -28,13 +28,14 @@ import com.craigmurphy.itemlog.viewmodel.ItemsViewModel
 @Composable
 fun ItemsScreen(
     eventId: Long,
+    refreshTrigger: Boolean,
     onAddItemClick: (Long) -> Unit,
     onRecordSaleClick: (Long) -> Unit,
     onTransactionsClick: (Long) -> Unit
 ) {
     val viewModel: ItemsViewModel = viewModel()
 
-    LaunchedEffect(eventId) {
+    LaunchedEffect(eventId, refreshTrigger) {
         viewModel.loadItems(eventId)
     }
 
