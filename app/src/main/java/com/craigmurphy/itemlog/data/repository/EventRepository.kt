@@ -88,4 +88,13 @@ class EventRepository(private val context: Context) {
             Result.failure(e)
         }
     }
+
+    suspend fun getTransactions(eventId: Long): Result<List<TransactionResponse>> {
+        return try {
+            val response = RetrofitClient.create(context).getTransactions(eventId)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

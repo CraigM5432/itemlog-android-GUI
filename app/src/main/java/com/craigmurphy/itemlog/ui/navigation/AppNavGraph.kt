@@ -124,8 +124,12 @@ fun AppNavGraph() {
         composable(
             route = Routes.TRANSACTIONS,
             arguments = listOf(navArgument("eventId") { type = NavType.LongType })
-        ) {
-            TransactionsScreen()
+        ) { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getLong("eventId") ?: 0L
+
+            TransactionsScreen(
+                eventId = eventId
+            )
         }
     }
 }

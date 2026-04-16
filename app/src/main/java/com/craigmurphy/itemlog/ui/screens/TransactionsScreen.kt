@@ -14,26 +14,27 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
-
-data class TransactionUiModel(
-    val id: Int,
-    val itemName: String,
-    val quantitySold: Int,
-    val salePrice: Double,
-    val saleTime: String
-)
+import com.craigmurphy.itemlog.viewmodel.TransactionsViewModel
 
 @Composable
-fun TransactionsScreen() {
-    val transactions = listOf(
-        TransactionUiModel(1, "T-Shirt", 2, 40.0, "2026-03-23 11:00"),
-        TransactionUiModel(2, "Hoodie", 1, 35.0, "2026-03-23 12:30"),
-        TransactionUiModel(3, "Cap", 3, 45.0, "2026-03-23 13:15")
-    )
+fun TransactionsScreen(
+    eventId: Long
+) {
+    val viewModel: TransactionsViewModel = viewModel()
+
+    LaunchedEffect(eventId) {
+        viewModel.loadTransactions(eventId)
+    }
+
+    val transactions = viewModel.transactions.value
+    val isLoading = viewModel.isLoading.value
+    val errorMessage = viewModel.errorMessage.value
 
     Scaffold(
         topBar = {
@@ -46,28 +47,47 @@ fun TransactionsScreen() {
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-            ScreenHeader("Sales History")
+            ScreenHeader("Sales history")
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(transactions) { transaction ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth()
+            when {
+                isLoading -> {
+                    Text("Loading transactions...")
+                }
+
+                errorMessage != null -> {
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+
+                transactions.isEmpty() -> {
+                    Text("No transactions found.")
+                }
+
+                else -> {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            Text(
-                                text = transaction.itemName,
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(text = "Quantity Sold: ${transaction.quantitySold}")
-                            Text(text = "Sale Price: €${transaction.salePrice}")
-                            Text(text = "Time: ${transaction.saleTime}")
+                        items(transactions) { transaction ->
+                            Card(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(16.dp)
+                                ) {
+                                    Text(
+                                        text = "Transaction #${transaction.transactionId}",
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(text = "Quantity Sold: ${transaction.quantitySold}")
+                                    Text(text = "Sale Price: €${transaction.salePrice}")
+                                    Text(text = "Time: ${transaction.saleTime}")
+                                }
+                            }
                         }
                     }
                 }
