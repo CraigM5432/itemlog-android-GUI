@@ -22,9 +22,15 @@ fun AppNavGraph() {
     val navController = rememberNavController()
     val sessionViewModel: SessionViewModel = viewModel()
 
+    val startDestination = if (sessionViewModel.isLoggedIn()) {
+        Routes.EVENTS
+    } else {
+        Routes.LOGIN
+    }
+
     NavHost(
         navController = navController,
-        startDestination = Routes.LOGIN
+        startDestination = startDestination
     ) {
         composable(Routes.LOGIN) {
             LoginScreen(
