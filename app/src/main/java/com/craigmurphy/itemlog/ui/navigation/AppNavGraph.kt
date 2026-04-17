@@ -14,10 +14,13 @@ import com.craigmurphy.itemlog.ui.screens.LoginScreen
 import com.craigmurphy.itemlog.ui.screens.RecordSaleScreen
 import com.craigmurphy.itemlog.ui.screens.RegisterScreen
 import com.craigmurphy.itemlog.ui.screens.TransactionsScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.craigmurphy.itemlog.viewmodel.SessionViewModel
 
 @Composable
 fun AppNavGraph() {
     val navController = rememberNavController()
+    val sessionViewModel: SessionViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -58,6 +61,12 @@ fun AppNavGraph() {
                 onEventClick = { eventId ->
                     backStackEntry.savedStateHandle["refresh_events"] = false
                     navController.navigate(Routes.itemsRoute(eventId))
+                },
+                onLogoutClick = {
+                    sessionViewModel.logout()
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
             )
         }

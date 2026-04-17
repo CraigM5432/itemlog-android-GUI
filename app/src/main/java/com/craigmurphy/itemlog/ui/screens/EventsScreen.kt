@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
@@ -24,11 +25,13 @@ import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.EventsViewModel
 
+
 @Composable
 fun EventsScreen(
     refreshTrigger: Boolean,
     onCreateEventClick: () -> Unit,
-    onEventClick: (Long) -> Unit
+    onEventClick: (Long) -> Unit,
+    onLogoutClick: () -> Unit
 ) {
     val viewModel: EventsViewModel = viewModel()
 
@@ -58,8 +61,16 @@ fun EventsScreen(
         ) {
             ScreenHeader("Select an event")
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
+            Button(
+                onClick = onLogoutClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Logout")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
             when {
                 isLoading -> {
                     Text("Loading events...")
