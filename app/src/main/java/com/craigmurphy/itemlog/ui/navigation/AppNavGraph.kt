@@ -18,6 +18,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.viewmodel.SessionViewModel
 import androidx.compose.runtime.LaunchedEffect
 import com.craigmurphy.itemlog.session.AuthState
+import com.craigmurphy.itemlog.ui.screens.SplashScreen
 
 @Composable
 fun AppNavGraph() {
@@ -32,16 +33,25 @@ fun AppNavGraph() {
         }
     }
 
-    val startDestination = if (sessionViewModel.isLoggedIn()) {
-        Routes.EVENTS
-    } else {
-        Routes.LOGIN
-    }
-
     NavHost(
         navController = navController,
-        startDestination = startDestination
-    ) {
+        startDestination = Routes.SPLASH
+
+    ) {composable(Routes.SPLASH) {
+        SplashScreen()
+
+        LaunchedEffect(Unit) {
+            if (sessionViewModel.isLoggedIn()) {
+                navController.navigate(Routes.EVENTS) {
+                    popUpTo(Routes.SPLASH) { inclusive = true }
+                }
+            } else {
+                navController.navigate(Routes.LOGIN) {
+                    popUpTo(Routes.SPLASH) { inclusive = true }
+                }
+            }
+        }
+    }
         composable(Routes.LOGIN) {
             LoginScreen(
                 onLoginClick = {
