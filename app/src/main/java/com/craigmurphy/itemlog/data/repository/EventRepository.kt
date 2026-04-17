@@ -8,6 +8,7 @@ import com.craigmurphy.itemlog.data.model.ItemResponse
 import com.craigmurphy.itemlog.data.model.CreateItemRequest
 import com.craigmurphy.itemlog.data.model.CreateTransactionRequest
 import com.craigmurphy.itemlog.data.model.TransactionResponse
+import retrofit2.HttpException
 
 class EventRepository(private val context: Context) {
 
@@ -15,6 +16,9 @@ class EventRepository(private val context: Context) {
         return try {
             val response = RetrofitClient.create(context).getEvents()
             Result.success(response)
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            Result.failure(Exception("HTTP ${e.code()}: $errorBody"))
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -29,6 +33,9 @@ class EventRepository(private val context: Context) {
                 )
             )
             Result.success(response)
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            Result.failure(Exception("HTTP ${e.code()}: $errorBody"))
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -38,6 +45,9 @@ class EventRepository(private val context: Context) {
         return try {
             val response = RetrofitClient.create(context).getItems(eventId)
             Result.success(response)
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            Result.failure(Exception("HTTP ${e.code()}: $errorBody"))
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -63,6 +73,9 @@ class EventRepository(private val context: Context) {
                 )
             )
             Result.success(response)
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            Result.failure(Exception("HTTP ${e.code()}: $errorBody"))
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -84,6 +97,9 @@ class EventRepository(private val context: Context) {
                 )
             )
             Result.success(response)
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            Result.failure(Exception("HTTP ${e.code()}: $errorBody"))
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -93,6 +109,9 @@ class EventRepository(private val context: Context) {
         return try {
             val response = RetrofitClient.create(context).getTransactions(eventId)
             Result.success(response)
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            Result.failure(Exception("HTTP ${e.code()}: $errorBody"))
         } catch (e: Exception) {
             Result.failure(e)
         }

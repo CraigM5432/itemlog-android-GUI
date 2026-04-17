@@ -15,11 +15,13 @@ class EventsViewModel(application: Application) : AndroidViewModel(application) 
     var events = mutableStateOf<List<EventResponse>>(emptyList())
     var isLoading = mutableStateOf(false)
     var errorMessage = mutableStateOf<String?>(null)
+    var unauthorized = mutableStateOf(false)
 
     fun loadEvents() {
         viewModelScope.launch {
             isLoading.value = true
             errorMessage.value = null
+            unauthorized.value = false
 
             val result = repository.getEvents()
 
@@ -28,7 +30,12 @@ class EventsViewModel(application: Application) : AndroidViewModel(application) 
             if (result.isSuccess) {
                 events.value = result.getOrNull() ?: emptyList()
             } else {
-                errorMessage.value = result.exceptionOrNull()?.message
+                val message = result.exceptionOrNull()?.message ?: "Unknown error"
+                errorMessage.value = message
+
+                if (message.contains("HTTP 401")) {
+                    unauthorized.value = true
+                }
             }
         }
     }

@@ -31,7 +31,8 @@ fun EventsScreen(
     refreshTrigger: Boolean,
     onCreateEventClick: () -> Unit,
     onEventClick: (Long) -> Unit,
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
+    onSessionExpired: () -> Unit
 ) {
     val viewModel: EventsViewModel = viewModel()
 
@@ -42,6 +43,13 @@ fun EventsScreen(
     val events = viewModel.events.value
     val isLoading = viewModel.isLoading.value
     val errorMessage = viewModel.errorMessage.value
+    val unauthorized = viewModel.unauthorized.value
+
+    LaunchedEffect(unauthorized) {
+        if (unauthorized) {
+            onSessionExpired()
+        }
+    }
 
     Scaffold(
         topBar = {

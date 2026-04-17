@@ -16,11 +16,21 @@ import com.craigmurphy.itemlog.ui.screens.RegisterScreen
 import com.craigmurphy.itemlog.ui.screens.TransactionsScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.viewmodel.SessionViewModel
+import androidx.compose.runtime.LaunchedEffect
+import com.craigmurphy.itemlog.session.AuthState
 
 @Composable
 fun AppNavGraph() {
     val navController = rememberNavController()
     val sessionViewModel: SessionViewModel = viewModel()
+
+    LaunchedEffect(sessionViewModel.authState.value) {
+        if (sessionViewModel.authState.value is AuthState.Unauthenticated) {
+            navController.navigate(Routes.LOGIN) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
 
     val startDestination = if (sessionViewModel.isLoggedIn()) {
         Routes.EVENTS
@@ -35,7 +45,10 @@ fun AppNavGraph() {
         composable(Routes.LOGIN) {
             LoginScreen(
                 onLoginClick = {
-                    navController.navigate(Routes.EVENTS)
+                    sessionViewModel.onLoginSuccess()
+                    navController.navigate(Routes.EVENTS) {
+                        popUpTo(Routes.LOGIN) { inclusive = true }
+                    }
                 },
                 onRegisterClick = {
                     navController.navigate(Routes.REGISTER)
@@ -73,6 +86,9 @@ fun AppNavGraph() {
                     navController.navigate(Routes.LOGIN) {
                         popUpTo(0) { inclusive = true }
                     }
+                },
+                onSessionExpired = {
+                    sessionViewModel.handleUnauthorized()
                 }
             )
         }
