@@ -29,7 +29,8 @@ import com.craigmurphy.itemlog.data.model.ItemResponse
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.RecordSaleViewModel
-
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 @Composable
 fun RecordSaleScreen(
     eventId: Long,
@@ -120,7 +121,8 @@ fun RecordSaleScreen(
                 value = quantitySold,
                 onValueChange = { quantitySold = it },
                 label = { Text("Quantity Sold") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -129,7 +131,8 @@ fun RecordSaleScreen(
                 value = salePrice,
                 onValueChange = { salePrice = it },
                 label = { Text("Sale Price") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
 
             errorMessage?.let {

@@ -65,7 +65,7 @@ fun CreateEventScreen(
             OutlinedTextField(
                 value = eventDate,
                 onValueChange = { eventDate = it },
-                label = { Text("Event Date (YYYY-MM-DD)") },
+                label = { Text("Event Date - YYYY-MM-DD") },
                 modifier = Modifier.fillMaxWidth()
             )
 

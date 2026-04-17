@@ -25,6 +25,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.AddItemViewModel
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 
 @Composable
 fun AddItemScreen(
@@ -70,7 +72,8 @@ fun AddItemScreen(
                 value = price,
                 onValueChange = { price = it },
                 label = { Text("Price") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -79,7 +82,8 @@ fun AddItemScreen(
                 value = quantity,
                 onValueChange = { quantity = it },
                 label = { Text("Quantity") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
 
             Spacer(modifier = Modifier.height(12.dp))

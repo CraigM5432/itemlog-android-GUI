@@ -10,12 +10,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -71,7 +71,7 @@ fun EventsScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Button(
+            TextButton(
                 onClick = onLogoutClick,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -92,7 +92,7 @@ fun EventsScreen(
                 }
 
                 events.isEmpty() -> {
-                    Text("No events found.")
+                    Text("No events found yet. Tap + to create your first event.")
                 }
 
                 else -> {

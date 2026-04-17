@@ -101,7 +101,7 @@ fun ItemsScreen(
                 }
 
                 items.isEmpty() -> {
-                    Text("No items found.")
+                    Text("No items found for this event yet. Tap Add Item to create one.")
                 }
 
                 else -> {

@@ -26,6 +26,8 @@ import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.viewmodel.LoginViewModel
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 
 @Composable
 fun LoginScreen(
@@ -58,7 +60,8 @@ fun LoginScreen(
                 value = username,
                 onValueChange = { username = it },
                 label = { Text("Username") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
 
             Spacer(modifier = Modifier.height(16.dp))

@@ -64,7 +64,7 @@ fun TransactionsScreen(
                 }
 
                 transactions.isEmpty() -> {
-                    Text("No transactions found.")
+                    Text("No transactions recorded for this event yet.")
                 }
 
                 else -> {
