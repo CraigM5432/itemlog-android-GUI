@@ -23,6 +23,25 @@ class CreateEventViewModel(application: Application) : AndroidViewModel(applicat
             isLoading.value = true
             errorMessage.value = null
 
+            if (eventName.isBlank()) {
+                isLoading.value = false
+                errorMessage.value = "Event name is required."
+                return@launch
+            }
+
+            if (eventDate.isBlank()) {
+                isLoading.value = false
+                errorMessage.value = "Event date is required."
+                return@launch
+            }
+
+            val dateRegex = Regex("""\d{4}-\d{2}-\d{2}""")
+            if (!dateRegex.matches(eventDate)) {
+                isLoading.value = false
+                errorMessage.value = "Use date format YYYY-MM-DD."
+                return@launch
+            }
+
             val result = repository.createEvent(eventName, eventDate)
 
             isLoading.value = false

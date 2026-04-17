@@ -36,13 +36,26 @@ class RegisterViewModel(application: Application) : AndroidViewModel(application
                 return@launch
             }
 
+            val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+            if (!emailRegex.matches(email)) {
+                isLoading.value = false
+                errorMessage.value = "Enter a valid email address."
+                return@launch
+            }
+
             if (password.isBlank()) {
                 isLoading.value = false
                 errorMessage.value = "Password is required."
                 return@launch
             }
 
-            val result = repository.register(username, email, password)
+            if (password.length < 8) {
+                isLoading.value = false
+                errorMessage.value = "Password must be at least 8 characters."
+                return@launch
+            }
+
+            val result = repository.register(username.trim(), email.trim(), password)
 
             isLoading.value = false
 

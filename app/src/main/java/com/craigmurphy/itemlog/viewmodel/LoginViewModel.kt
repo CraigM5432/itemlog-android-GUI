@@ -1,13 +1,12 @@
 package com.craigmurphy.itemlog.viewmodel
 
+import android.app.Application
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.craigmurphy.itemlog.data.local.TokenManager
 import com.craigmurphy.itemlog.data.repository.AuthRepository
 import kotlinx.coroutines.launch
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import com.craigmurphy.itemlog.data.local.TokenManager
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -26,7 +25,19 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             isLoading.value = true
             errorMessage.value = null
 
-            val result = repository.login(username, password)
+            if (username.isBlank()) {
+                isLoading.value = false
+                errorMessage.value = "Username is required."
+                return@launch
+            }
+
+            if (password.isBlank()) {
+                isLoading.value = false
+                errorMessage.value = "Password is required."
+                return@launch
+            }
+
+            val result = repository.login(username.trim(), password)
 
             isLoading.value = false
 

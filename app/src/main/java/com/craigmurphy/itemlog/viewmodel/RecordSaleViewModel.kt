@@ -61,9 +61,28 @@ class RecordSaleViewModel(application: Application) : AndroidViewModel(applicati
                 return@launch
             }
 
+            if (parsedQuantitySold <= 0) {
+                isSaving.value = false
+                errorMessage.value = "Quantity sold must be greater than 0."
+                return@launch
+            }
+
             if (parsedSalePrice == null) {
                 isSaving.value = false
                 errorMessage.value = "Enter a valid sale price."
+                return@launch
+            }
+
+            if (parsedSalePrice <= 0.0) {
+                isSaving.value = false
+                errorMessage.value = "Sale price must be greater than 0."
+                return@launch
+            }
+
+            val selectedItem = items.value.find { it.itemId == selectedItemId }
+            if (selectedItem != null && parsedQuantitySold > selectedItem.quantity) {
+                isSaving.value = false
+                errorMessage.value = "Not enough stock available."
                 return@launch
             }
 

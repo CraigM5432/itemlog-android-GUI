@@ -42,15 +42,27 @@ class AddItemViewModel(application: Application) : AndroidViewModel(application)
                 return@launch
             }
 
+            if (parsedPrice <= 0.0) {
+                isLoading.value = false
+                errorMessage.value = "Price must be greater than 0."
+                return@launch
+            }
+
             if (parsedQuantity == null) {
                 isLoading.value = false
                 errorMessage.value = "Enter a valid quantity."
                 return@launch
             }
 
+            if (parsedQuantity < 0) {
+                isLoading.value = false
+                errorMessage.value = "Quantity cannot be negative."
+                return@launch
+            }
+
             val result = repository.createItem(
                 eventId = eventId,
-                name = name,
+                name = name.trim(),
                 price = parsedPrice,
                 size = size.ifBlank { null },
                 quantity = parsedQuantity,
