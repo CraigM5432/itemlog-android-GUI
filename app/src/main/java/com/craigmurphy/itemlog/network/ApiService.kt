@@ -7,7 +7,6 @@ import com.craigmurphy.itemlog.data.model.EventResponse
 import com.craigmurphy.itemlog.data.model.ItemResponse
 import com.craigmurphy.itemlog.data.model.LoginRequest
 import com.craigmurphy.itemlog.data.model.LoginResponse
-import com.craigmurphy.itemlog.data.model.MessageResponse
 import com.craigmurphy.itemlog.data.model.RegisterRequest
 import com.craigmurphy.itemlog.data.model.RegisterResponse
 import com.craigmurphy.itemlog.data.model.TransactionResponse
@@ -57,4 +56,9 @@ interface ApiService {
         @Path("eventId") eventId: Long,
         @Body request: CreateTransactionRequest
     ): TransactionResponse
+
+    @GET("events/{eventId}/transactions/export")
+    suspend fun exportTransactionsCsv(
+        @Path("eventId") eventId: Long
+    ): String
 }

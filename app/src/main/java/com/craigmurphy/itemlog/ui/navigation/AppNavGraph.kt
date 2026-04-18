@@ -19,6 +19,7 @@ import com.craigmurphy.itemlog.viewmodel.SessionViewModel
 import androidx.compose.runtime.LaunchedEffect
 import com.craigmurphy.itemlog.session.AuthState
 import com.craigmurphy.itemlog.ui.screens.SplashScreen
+import com.craigmurphy.itemlog.ui.screens.ExportCsvScreen
 
 @Composable
 fun AppNavGraph() {
@@ -139,6 +140,10 @@ fun AppNavGraph() {
                 onTransactionsClick = { id ->
                     backStackEntry.savedStateHandle["refresh_items"] = false
                     navController.navigate(Routes.transactionsRoute(id))
+                },
+                onExportCsvClick = { id ->
+                    backStackEntry.savedStateHandle["refresh_items"] = false
+                    navController.navigate(Routes.exportCsvRoute(id))
                 }
             )
         }
@@ -190,6 +195,17 @@ fun AppNavGraph() {
             val eventId = backStackEntry.arguments?.getLong("eventId") ?: 0L
 
             TransactionsScreen(
+                eventId = eventId
+            )
+        }
+
+        composable(
+            route = Routes.EXPORT_CSV,
+            arguments = listOf(navArgument("eventId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getLong("eventId") ?: 0L
+
+            ExportCsvScreen(
                 eventId = eventId
             )
         }

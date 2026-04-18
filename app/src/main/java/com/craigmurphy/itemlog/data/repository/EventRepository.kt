@@ -116,4 +116,13 @@ class EventRepository(private val context: Context) {
             Result.failure(e)
         }
     }
+
+    suspend fun exportTransactionsCsv(eventId: Long): Result<String> {
+        return try {
+            val response = RetrofitClient.create(context).exportTransactionsCsv(eventId)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

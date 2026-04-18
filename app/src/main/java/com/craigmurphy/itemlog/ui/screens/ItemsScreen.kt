@@ -31,7 +31,8 @@ fun ItemsScreen(
     refreshTrigger: Boolean,
     onAddItemClick: (Long) -> Unit,
     onRecordSaleClick: (Long) -> Unit,
-    onTransactionsClick: (Long) -> Unit
+    onTransactionsClick: (Long) -> Unit,
+    onExportCsvClick: (Long) -> Unit
 ) {
     val viewModel: ItemsViewModel = viewModel()
 
@@ -80,6 +81,15 @@ fun ItemsScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("View Transactions")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedButton(
+                onClick = { onExportCsvClick(eventId) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Export CSV")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
