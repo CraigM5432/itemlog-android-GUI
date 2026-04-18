@@ -144,6 +144,9 @@ fun AppNavGraph() {
                 onExportCsvClick = { id ->
                     backStackEntry.savedStateHandle["refresh_items"] = false
                     navController.navigate(Routes.exportCsvRoute(id))
+                },
+                onItemDeleted = {
+                    backStackEntry.savedStateHandle["refresh_items"] = true
                 }
             )
         }

@@ -24,6 +24,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.ItemsViewModel
+import androidx.compose.material3.TextButton
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.craigmurphy.itemlog.viewmodel.DeleteItemViewModel
 
 @Composable
 fun ItemsScreen(
@@ -32,7 +35,8 @@ fun ItemsScreen(
     onAddItemClick: (Long) -> Unit,
     onRecordSaleClick: (Long) -> Unit,
     onTransactionsClick: (Long) -> Unit,
-    onExportCsvClick: (Long) -> Unit
+    onExportCsvClick: (Long) -> Unit,
+    onItemDeleted: () -> Unit
 ) {
     val viewModel: ItemsViewModel = viewModel()
 
@@ -43,6 +47,7 @@ fun ItemsScreen(
     val items = viewModel.items.value
     val isLoading = viewModel.isLoading.value
     val errorMessage = viewModel.errorMessage.value
+    val deleteViewModel: DeleteItemViewModel = viewModel()
 
     Scaffold(
         topBar = {
@@ -134,6 +139,18 @@ fun ItemsScreen(
                                     Text(text = "Stock: ${item.quantity}")
                                     Text(text = "Size: ${item.size ?: "N/A"}")
                                     Text(text = "Description: ${item.description ?: "N/A"}")
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    TextButton(
+                                        onClick = {
+                                            deleteViewModel.deleteItem(eventId, item.itemId) {
+                                                onItemDeleted()
+                                            }
+                                        }
+                                    ) {
+                                        Text("Delete")
+                                    }
                                 }
                             }
                         }

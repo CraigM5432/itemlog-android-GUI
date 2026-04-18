@@ -125,4 +125,13 @@ class EventRepository(private val context: Context) {
             Result.failure(e)
         }
     }
+
+    suspend fun deleteItem(eventId: Long, itemId: Long): Result<Unit> {
+        return try {
+            RetrofitClient.create(context).deleteItem(eventId, itemId)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

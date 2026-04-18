@@ -14,6 +14,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.DELETE
 
 interface ApiService {
 
@@ -61,4 +62,10 @@ interface ApiService {
     suspend fun exportTransactionsCsv(
         @Path("eventId") eventId: Long
     ): String
+
+    @DELETE("events/{eventId}/items/{itemId}")
+    suspend fun deleteItem(
+        @Path("eventId") eventId: Long,
+        @Path("itemId") itemId: Long
+    ): Unit
 }
