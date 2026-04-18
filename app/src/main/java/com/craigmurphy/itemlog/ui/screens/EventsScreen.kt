@@ -24,6 +24,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.EventsViewModel
+import com.craigmurphy.itemlog.ui.components.EventCard
 
 
 @Composable
@@ -67,7 +68,14 @@ fun EventsScreen(
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-            ScreenHeader("Select an event")
+            ScreenHeader("Your Events")
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Select an event to manage items and sales.",
+                style = MaterialTheme.typography.bodyMedium
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -100,22 +108,13 @@ fun EventsScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(events) { event ->
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { onEventClick(event.eventId) }
-                            ) {
-                                Column(
-                                    modifier = Modifier.padding(16.dp)
-                                ) {
-                                    Text(
-                                        text = event.eventName,
-                                        style = MaterialTheme.typography.titleMedium
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(text = "Date: ${event.eventDate}")
+                            EventCard(
+                                eventName = event.eventName,
+                                eventDate = event.eventDate,
+                                onClick = {
+                                    onEventClick(event.eventId)
                                 }
-                            }
+                            )
                         }
                     }
                 }

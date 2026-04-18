@@ -47,7 +47,7 @@ fun TransactionsScreen(
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-            ScreenHeader("Sales history")
+            ScreenHeader("Transactions history")
 
             Spacer(modifier = Modifier.height(16.dp))
 

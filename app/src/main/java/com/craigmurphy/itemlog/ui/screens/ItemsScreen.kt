@@ -84,7 +84,7 @@ fun ItemsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            ScreenHeader("Event Items")
+            ScreenHeader("Items for this event")
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -101,7 +101,7 @@ fun ItemsScreen(
                 }
 
                 items.isEmpty() -> {
-                    Text("No items found for this event yet. Tap Add Item to create one.")
+                    Text("No items found for this event yet. Use Add Item to create your first item.")
                 }
 
                 else -> {
