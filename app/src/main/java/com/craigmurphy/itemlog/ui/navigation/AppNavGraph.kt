@@ -125,10 +125,16 @@ fun AppNavGraph() {
             val eventId = backStackEntry.arguments?.getLong("eventId") ?: 0L
             val refreshItems =
                 backStackEntry.savedStateHandle.get<Boolean>("refresh_items") ?: false
+            val itemsMessage =
+                backStackEntry.savedStateHandle.get<String>("items_message")
 
             ItemsScreen(
                 eventId = eventId,
                 refreshTrigger = refreshItems,
+                message = itemsMessage,
+                onMessageShown = {
+                    backStackEntry.savedStateHandle["items_message"] = null
+                },
                 onAddItemClick = { id ->
                     backStackEntry.savedStateHandle["refresh_items"] = false
                     navController.navigate(Routes.addItemRoute(id))
@@ -163,6 +169,9 @@ fun AppNavGraph() {
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set("refresh_items", true)
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("items_message", "Item added successfully.")
                     navController.popBackStack()
                 },
                 onCancelClick = {
@@ -183,6 +192,9 @@ fun AppNavGraph() {
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set("refresh_items", true)
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("items_message", "Sale recorded successfully.")
                     navController.popBackStack()
                 },
                 onCancelClick = {

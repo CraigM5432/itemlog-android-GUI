@@ -10,28 +10,39 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.craigmurphy.itemlog.data.model.ItemResponse
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
-import com.craigmurphy.itemlog.viewmodel.ItemsViewModel
-import androidx.compose.material3.TextButton
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.viewmodel.DeleteItemViewModel
+import com.craigmurphy.itemlog.viewmodel.ItemsViewModel
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun ItemsScreen(
     eventId: Long,
     refreshTrigger: Boolean,
+    message: String?,
+    onMessageShown: () -> Unit,
     onAddItemClick: (Long) -> Unit,
     onRecordSaleClick: (Long) -> Unit,
     onTransactionsClick: (Long) -> Unit,
@@ -39,19 +50,33 @@ fun ItemsScreen(
     onItemDeleted: () -> Unit
 ) {
     val viewModel: ItemsViewModel = viewModel()
+    val deleteViewModel: DeleteItemViewModel = viewModel()
+
+    var itemPendingDelete by remember { mutableStateOf<ItemResponse?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(eventId, refreshTrigger) {
         viewModel.loadItems(eventId)
+    }
+    LaunchedEffect(message) {
+        if (!message.isNullOrBlank()) {
+            snackbarHostState.showSnackbar(message)
+            onMessageShown()
+        }
     }
 
     val items = viewModel.items.value
     val isLoading = viewModel.isLoading.value
     val errorMessage = viewModel.errorMessage.value
-    val deleteViewModel: DeleteItemViewModel = viewModel()
+    val deleteErrorMessage = deleteViewModel.errorMessage.value
 
     Scaffold(
         topBar = {
             SimpleTopBar("Items")
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
     ) { innerPadding ->
         Column(
@@ -103,6 +128,14 @@ fun ItemsScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            deleteErrorMessage?.let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
             when {
                 isLoading -> {
                     Text("Loading items...")
@@ -134,7 +167,9 @@ fun ItemsScreen(
                                         text = item.name,
                                         style = MaterialTheme.typography.titleMedium
                                     )
+
                                     Spacer(modifier = Modifier.height(4.dp))
+
                                     Text(text = "Price: €${item.price}")
                                     Text(text = "Stock: ${item.quantity}")
                                     Text(text = "Size: ${item.size ?: "N/A"}")
@@ -144,9 +179,7 @@ fun ItemsScreen(
 
                                     TextButton(
                                         onClick = {
-                                            deleteViewModel.deleteItem(eventId, item.itemId) {
-                                                onItemDeleted()
-                                            }
+                                            itemPendingDelete = item
                                         }
                                     ) {
                                         Text("Delete")
@@ -158,5 +191,43 @@ fun ItemsScreen(
                 }
             }
         }
+    }
+
+    itemPendingDelete?.let { item ->
+        AlertDialog(
+            onDismissRequest = {
+                itemPendingDelete = null
+            },
+            title = {
+                Text("Delete Item")
+            },
+            text = {
+                Text("Are you sure you want to delete \"${item.name}\"?")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        deleteViewModel.deleteItem(eventId, item.itemId) {
+                            itemPendingDelete = null
+                            onItemDeleted()
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar("Item deleted successfully.")
+                            }
+                        }
+                    }
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = {
+                        itemPendingDelete = null
+                    }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
