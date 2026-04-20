@@ -25,6 +25,7 @@ import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.ExportCsvViewModel
 import java.io.File
+import com.craigmurphy.itemlog.ui.components.EventSummaryCard
 
 @Composable
 fun ExportCsvScreen(
@@ -38,6 +39,7 @@ fun ExportCsvScreen(
     }
 
     val csvContent = viewModel.csvContent.value
+    val event = viewModel.event.value
     val isLoading = viewModel.isLoading.value
     val errorMessage = viewModel.errorMessage.value
 
@@ -54,6 +56,14 @@ fun ExportCsvScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Top
         ) {
+            event?.let {
+                EventSummaryCard(
+                    eventName = it.eventName,
+                    eventDate = it.eventDate
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
             ScreenHeader("Transactions CSV")
 
             Spacer(modifier = Modifier.height(16.dp))

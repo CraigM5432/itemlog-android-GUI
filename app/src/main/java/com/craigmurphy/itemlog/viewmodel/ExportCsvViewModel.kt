@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.craigmurphy.itemlog.data.model.EventResponse
 import com.craigmurphy.itemlog.data.repository.EventRepository
 import kotlinx.coroutines.launch
 
@@ -12,6 +13,7 @@ class ExportCsvViewModel(application: Application) : AndroidViewModel(applicatio
     private val repository = EventRepository(application)
 
     var csvContent = mutableStateOf("")
+    var event = mutableStateOf<EventResponse?>(null)
     var isLoading = mutableStateOf(false)
     var errorMessage = mutableStateOf<String?>(null)
 
@@ -21,15 +23,20 @@ class ExportCsvViewModel(application: Application) : AndroidViewModel(applicatio
             errorMessage.value = null
             csvContent.value = ""
 
-            val result = repository.exportTransactionsCsv(eventId)
+            val csvResult = repository.exportTransactionsCsv(eventId)
+            val eventResult = repository.getEventById(eventId)
+
+            if (csvResult.isSuccess) {
+                csvContent.value = csvResult.getOrNull() ?: ""
+            } else {
+                errorMessage.value = csvResult.exceptionOrNull()?.message
+            }
+
+            if (eventResult.isSuccess) {
+                event.value = eventResult.getOrNull()
+            }
 
             isLoading.value = false
-
-            if (result.isSuccess) {
-                csvContent.value = result.getOrNull() ?: ""
-            } else {
-                errorMessage.value = result.exceptionOrNull()?.message
-            }
         }
     }
 }

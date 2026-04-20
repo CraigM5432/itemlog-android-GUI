@@ -21,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.TransactionsViewModel
+import com.craigmurphy.itemlog.ui.components.EventSummaryCard
 
 @Composable
 fun TransactionsScreen(
@@ -35,6 +36,7 @@ fun TransactionsScreen(
     val transactions = viewModel.transactions.value
     val isLoading = viewModel.isLoading.value
     val errorMessage = viewModel.errorMessage.value
+    val event = viewModel.event.value
 
     Scaffold(
         topBar = {
@@ -47,6 +49,14 @@ fun TransactionsScreen(
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
+            event?.let {
+                EventSummaryCard(
+                    eventName = it.eventName,
+                    eventDate = it.eventDate
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
             ScreenHeader("Transactions history")
 
             Spacer(modifier = Modifier.height(16.dp))

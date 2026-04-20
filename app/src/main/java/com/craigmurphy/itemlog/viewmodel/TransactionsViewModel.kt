@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.craigmurphy.itemlog.data.model.EventResponse
 import com.craigmurphy.itemlog.data.model.TransactionResponse
 import com.craigmurphy.itemlog.data.repository.EventRepository
 import kotlinx.coroutines.launch
@@ -13,6 +14,7 @@ class TransactionsViewModel(application: Application) : AndroidViewModel(applica
     private val repository = EventRepository(application)
 
     var transactions = mutableStateOf<List<TransactionResponse>>(emptyList())
+    var event = mutableStateOf<EventResponse?>(null)
     var isLoading = mutableStateOf(false)
     var errorMessage = mutableStateOf<String?>(null)
 
@@ -21,15 +23,20 @@ class TransactionsViewModel(application: Application) : AndroidViewModel(applica
             isLoading.value = true
             errorMessage.value = null
 
-            val result = repository.getTransactions(eventId)
+            val transactionsResult = repository.getTransactions(eventId)
+            val eventResult = repository.getEventById(eventId)
+
+            if (transactionsResult.isSuccess) {
+                transactions.value = transactionsResult.getOrNull() ?: emptyList()
+            } else {
+                errorMessage.value = transactionsResult.exceptionOrNull()?.message
+            }
+
+            if (eventResult.isSuccess) {
+                event.value = eventResult.getOrNull()
+            }
 
             isLoading.value = false
-
-            if (result.isSuccess) {
-                transactions.value = result.getOrNull() ?: emptyList()
-            } else {
-                errorMessage.value = result.exceptionOrNull()?.message
-            }
         }
     }
 }
