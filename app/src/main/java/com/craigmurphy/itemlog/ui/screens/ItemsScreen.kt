@@ -47,6 +47,7 @@ fun ItemsScreen(
     onRecordSaleClick: (Long) -> Unit,
     onTransactionsClick: (Long) -> Unit,
     onExportCsvClick: (Long) -> Unit,
+    onEditItemClick: (ItemResponse) -> Unit,
     onItemDeleted: () -> Unit
 ) {
     val viewModel: ItemsViewModel = viewModel()
@@ -176,6 +177,14 @@ fun ItemsScreen(
                                     Text(text = "Description: ${item.description ?: "N/A"}")
 
                                     Spacer(modifier = Modifier.height(8.dp))
+
+                                    TextButton(
+                                        onClick = {
+                                            onEditItemClick(item)
+                                        }
+                                    ) {
+                                        Text("Edit")
+                                    }
 
                                     TextButton(
                                         onClick = {

@@ -20,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import com.craigmurphy.itemlog.session.AuthState
 import com.craigmurphy.itemlog.ui.screens.SplashScreen
 import com.craigmurphy.itemlog.ui.screens.ExportCsvScreen
+import com.craigmurphy.itemlog.ui.screens.EditItemScreen
 
 @Composable
 fun AppNavGraph() {
@@ -162,6 +163,20 @@ fun AppNavGraph() {
                 },
                 onItemDeleted = {
                     backStackEntry.savedStateHandle["refresh_items"] = true
+                },
+                onEditItemClick = { item ->
+                    backStackEntry.savedStateHandle["refresh_items"] = false
+                    navController.navigate(
+                        Routes.editItemRoute(
+                            eventId = eventId,
+                            itemId = item.itemId,
+                            name = item.name,
+                            price = item.price,
+                            size = item.size,
+                            quantity = item.quantity,
+                            description = item.description
+                        )
+                    )
                 }
             )
         }
@@ -231,6 +246,48 @@ fun AppNavGraph() {
 
             ExportCsvScreen(
                 eventId = eventId
+            )
+        }
+        composable(
+            route = Routes.EDIT_ITEM,
+            arguments = listOf(
+                navArgument("eventId") { type = NavType.LongType },
+                navArgument("itemId") { type = NavType.LongType },
+                navArgument("name") { type = NavType.StringType },
+                navArgument("price") { type = NavType.StringType },
+                navArgument("size") { type = NavType.StringType },
+                navArgument("quantity") { type = NavType.IntType },
+                navArgument("description") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getLong("eventId") ?: 0L
+            val itemId = backStackEntry.arguments?.getLong("itemId") ?: 0L
+            val name = backStackEntry.arguments?.getString("name") ?: ""
+            val price = backStackEntry.arguments?.getString("price") ?: ""
+            val size = backStackEntry.arguments?.getString("size") ?: ""
+            val quantity = backStackEntry.arguments?.getInt("quantity")?.toString() ?: "0"
+            val description = backStackEntry.arguments?.getString("description") ?: ""
+
+            EditItemScreen(
+                eventId = eventId,
+                itemId = itemId,
+                initialName = name,
+                initialPrice = price,
+                initialSize = size,
+                initialQuantity = quantity,
+                initialDescription = description,
+                onSaveClick = {
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("refresh_items", true)
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("items_message", "Item updated successfully.")
+                    navController.popBackStack()
+                },
+                onCancelClick = {
+                    navController.popBackStack()
+                }
             )
         }
     }
