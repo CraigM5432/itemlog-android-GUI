@@ -36,6 +36,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
+import com.craigmurphy.itemlog.ui.components.EventSummaryCard
 
 @Composable
 fun ItemsScreen(
@@ -56,6 +57,7 @@ fun ItemsScreen(
     var itemPendingDelete by remember { mutableStateOf<ItemResponse?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    val event = viewModel.event.value
 
     LaunchedEffect(eventId, refreshTrigger) {
         viewModel.loadItems(eventId)
@@ -86,6 +88,14 @@ fun ItemsScreen(
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
+            event?.let {
+                EventSummaryCard(
+                    eventName = it.eventName,
+                    eventDate = it.eventDate
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)

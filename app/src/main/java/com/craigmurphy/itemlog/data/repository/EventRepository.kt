@@ -161,4 +161,14 @@ class EventRepository(private val context: Context) {
             Result.failure(e)
         }
     }
+
+    suspend fun getEventById(eventId: Long): Result<EventResponse?> {
+        return try {
+            val events = RetrofitClient.create(context).getEvents()
+            val event = events.find { it.eventId == eventId }
+            Result.success(event)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
