@@ -28,6 +28,7 @@ import com.craigmurphy.itemlog.ui.components.EventCard
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
+import com.craigmurphy.itemlog.ui.components.EmptyState
 
 
 @Composable
@@ -104,7 +105,7 @@ fun EventsScreen(
             Spacer(modifier = Modifier.height(16.dp))
             when {
                 isLoading -> {
-                    Text("Loading events...")
+                    Text("Loading your events...")
                 }
 
                 errorMessage != null -> {
@@ -115,7 +116,11 @@ fun EventsScreen(
                 }
 
                 events.isEmpty() -> {
-                    Text("No events found yet. Tap + to create your first event.")
+                    EmptyState(
+                        title = "No events yet",
+                        message = "Tap the + button to create your first event and start tracking items and sales.",
+                        symbol = "📅"
+                    )
                 }
 
                 else -> {

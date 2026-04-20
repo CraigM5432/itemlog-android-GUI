@@ -22,6 +22,7 @@ import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.TransactionsViewModel
 import com.craigmurphy.itemlog.ui.components.EventSummaryCard
+import com.craigmurphy.itemlog.ui.components.EmptyState
 
 @Composable
 fun TransactionsScreen(
@@ -63,7 +64,7 @@ fun TransactionsScreen(
 
             when {
                 isLoading -> {
-                    Text("Loading transactions...")
+                    Text("Loading transactions history...")
                 }
 
                 errorMessage != null -> {
@@ -74,7 +75,11 @@ fun TransactionsScreen(
                 }
 
                 transactions.isEmpty() -> {
-                    Text("No transactions recorded for this event yet.")
+                    EmptyState(
+                        title = "No transactions yet",
+                        message = "Record a sale from the Items screen to see transaction history here.",
+                        symbol = "🧾"
+                    )
                 }
 
                 else -> {

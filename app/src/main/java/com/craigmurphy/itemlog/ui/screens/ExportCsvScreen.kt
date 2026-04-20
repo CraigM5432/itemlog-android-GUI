@@ -26,6 +26,7 @@ import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.ExportCsvViewModel
 import java.io.File
 import com.craigmurphy.itemlog.ui.components.EventSummaryCard
+import com.craigmurphy.itemlog.ui.components.EmptyState
 
 @Composable
 fun ExportCsvScreen(
@@ -70,7 +71,7 @@ fun ExportCsvScreen(
 
             when {
                 isLoading -> {
-                    Text("Loading CSV export...")
+                    Text("Preparing CSV export...")
                 }
 
                 errorMessage != null -> {
@@ -80,8 +81,12 @@ fun ExportCsvScreen(
                     )
                 }
 
-                csvContent.isBlank() -> {
-                    Text("No CSV data available.")
+                csvContent.isBlank() || csvContent.trim().lines().size <= 1 -> {
+                    EmptyState(
+                        title = "No export data",
+                        message = "This event does not have any transaction data available to export yet.",
+                        symbol = "📄"
+                    )
                 }
 
                 else -> {

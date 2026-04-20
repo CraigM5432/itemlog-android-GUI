@@ -37,6 +37,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import com.craigmurphy.itemlog.ui.components.EventSummaryCard
+import com.craigmurphy.itemlog.ui.components.EmptyState
 
 @Composable
 fun ItemsScreen(
@@ -149,7 +150,7 @@ fun ItemsScreen(
 
             when {
                 isLoading -> {
-                    Text("Loading items...")
+                    Text("Loading event items...")
                 }
 
                 errorMessage != null -> {
@@ -160,7 +161,11 @@ fun ItemsScreen(
                 }
 
                 items.isEmpty() -> {
-                    Text("No items found for this event yet. Use Add Item to create your first item.")
+                    EmptyState(
+                        title = "No items yet",
+                        message = "Use Add Item to create the first item for this event.",
+                        symbol = "📦"
+                    )
                 }
 
                 else -> {
