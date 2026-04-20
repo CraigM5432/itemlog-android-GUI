@@ -25,17 +25,23 @@ import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.EventsViewModel
 import com.craigmurphy.itemlog.ui.components.EventCard
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.remember
 
 
 @Composable
 fun EventsScreen(
     refreshTrigger: Boolean,
+    message: String?,
+    onMessageShown: () -> Unit,
     onCreateEventClick: () -> Unit,
     onEventClick: (Long) -> Unit,
     onLogoutClick: () -> Unit,
     onSessionExpired: () -> Unit
 ) {
     val viewModel: EventsViewModel = viewModel()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(refreshTrigger) {
         viewModel.loadEvents()
@@ -51,6 +57,12 @@ fun EventsScreen(
             onSessionExpired()
         }
     }
+    LaunchedEffect(message) {
+        if (!message.isNullOrBlank()) {
+            snackbarHostState.showSnackbar(message)
+            onMessageShown()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -60,6 +72,9 @@ fun EventsScreen(
             FloatingActionButton(onClick = onCreateEventClick) {
                 Text("+")
             }
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
     ) { innerPadding ->
         Column(

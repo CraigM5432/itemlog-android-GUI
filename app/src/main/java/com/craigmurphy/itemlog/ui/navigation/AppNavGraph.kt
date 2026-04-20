@@ -81,9 +81,15 @@ fun AppNavGraph() {
         composable(Routes.EVENTS) { backStackEntry ->
             val refreshEvents =
                 backStackEntry.savedStateHandle.get<Boolean>("refresh_events") ?: false
+            val eventsMessage =
+                backStackEntry.savedStateHandle.get<String>("events_message")
 
             EventsScreen(
                 refreshTrigger = refreshEvents,
+                message = eventsMessage,
+                onMessageShown = {
+                    backStackEntry.savedStateHandle["events_message"] = null
+                },
                 onCreateEventClick = {
                     backStackEntry.savedStateHandle["refresh_events"] = false
                     navController.navigate(Routes.CREATE_EVENT)
@@ -110,6 +116,9 @@ fun AppNavGraph() {
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set("refresh_events", true)
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("events_message", "Event created successfully.")
                     navController.popBackStack()
                 },
                 onCancelClick = {
