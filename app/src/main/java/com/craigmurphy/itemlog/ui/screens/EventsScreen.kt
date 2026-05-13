@@ -1,6 +1,5 @@
 package com.craigmurphy.itemlog.ui.screens
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,27 +9,25 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.craigmurphy.itemlog.ui.components.EmptyState
+import com.craigmurphy.itemlog.ui.components.EventCard
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.EventsViewModel
-import com.craigmurphy.itemlog.ui.components.EventCard
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.remember
-import com.craigmurphy.itemlog.ui.components.EmptyState
 
-
+// Main screen shown after login.
+// Displays all events belonging to the logged-in user.
 @Composable
 fun EventsScreen(
     refreshTrigger: Boolean,
@@ -41,9 +38,13 @@ fun EventsScreen(
     onLogoutClick: () -> Unit,
     onSessionExpired: () -> Unit
 ) {
+    // ViewModel responsible for loading events from the API.
     val viewModel: EventsViewModel = viewModel()
+
+    // Snackbar state used for temporary success messages.
     val snackbarHostState = remember { SnackbarHostState() }
 
+    // Reloads events when refreshTrigger changes.
     LaunchedEffect(refreshTrigger) {
         viewModel.loadEvents()
     }
@@ -53,11 +54,14 @@ fun EventsScreen(
     val errorMessage = viewModel.errorMessage.value
     val unauthorized = viewModel.unauthorized.value
 
+    // If the API returns 401 Unauthorized, trigger session-expired handling.
     LaunchedEffect(unauthorized) {
         if (unauthorized) {
             onSessionExpired()
         }
     }
+
+    // Shows success messages passed from another screen.
     LaunchedEffect(message) {
         if (!message.isNullOrBlank()) {
             snackbarHostState.showSnackbar(message)
@@ -78,6 +82,7 @@ fun EventsScreen(
             SnackbarHost(hostState = snackbarHostState)
         }
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -95,6 +100,7 @@ fun EventsScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Logout button clears token and returns to login.
             TextButton(
                 onClick = onLogoutClick,
                 modifier = Modifier.fillMaxWidth()
@@ -103,11 +109,14 @@ fun EventsScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
             when {
+                // Loading state.
                 isLoading -> {
                     Text("Loading your events...")
                 }
 
+                // Error state.
                 errorMessage != null -> {
                     Text(
                         text = errorMessage,
@@ -115,6 +124,7 @@ fun EventsScreen(
                     )
                 }
 
+                // Empty state if no events exist.
                 events.isEmpty() -> {
                     EmptyState(
                         title = "No events yet",
@@ -123,6 +133,7 @@ fun EventsScreen(
                     )
                 }
 
+                // Event list.
                 else -> {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(12.dp)

@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.craigmurphy.itemlog.data.repository.EventRepository
 import kotlinx.coroutines.launch
 
+// ViewModel for adding a new item to an event.
+// Validates item input before sending it to the backend.
 class AddItemViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = EventRepository(application)
@@ -30,33 +32,22 @@ class AddItemViewModel(application: Application) : AndroidViewModel(application)
             val parsedPrice = price.toDoubleOrNull()
             val parsedQuantity = quantity.toIntOrNull()
 
+            // Client-side validation improves usability, while backend validation still protects the API.
             if (name.isBlank()) {
                 isLoading.value = false
                 errorMessage.value = "Item name is required."
                 return@launch
             }
 
-            if (parsedPrice == null) {
+            if (parsedPrice == null || parsedPrice <= 0.0) {
                 isLoading.value = false
                 errorMessage.value = "Enter a valid price."
                 return@launch
             }
 
-            if (parsedPrice <= 0.0) {
-                isLoading.value = false
-                errorMessage.value = "Price must be greater than 0."
-                return@launch
-            }
-
-            if (parsedQuantity == null) {
+            if (parsedQuantity == null || parsedQuantity < 0) {
                 isLoading.value = false
                 errorMessage.value = "Enter a valid quantity."
-                return@launch
-            }
-
-            if (parsedQuantity < 0) {
-                isLoading.value = false
-                errorMessage.value = "Quantity cannot be negative."
                 return@launch
             }
 

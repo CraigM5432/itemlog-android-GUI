@@ -18,18 +18,22 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+
+import com.craigmurphy.itemlog.ui.components.EmptyState
+import com.craigmurphy.itemlog.ui.components.EventSummaryCard
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.TransactionsViewModel
-import com.craigmurphy.itemlog.ui.components.EventSummaryCard
-import com.craigmurphy.itemlog.ui.components.EmptyState
 
+// Displays transaction history for the selected event.
+// Transaction data is loaded from the backend API through TransactionsViewModel.
 @Composable
 fun TransactionsScreen(
     eventId: Long
 ) {
     val viewModel: TransactionsViewModel = viewModel()
 
+    // Loads transactions when the screen opens.
     LaunchedEffect(eventId) {
         viewModel.loadTransactions(eventId)
     }
@@ -41,16 +45,22 @@ fun TransactionsScreen(
 
     Scaffold(
         topBar = {
+
+            // Reusable screen top bar.
             SimpleTopBar("Transactions")
         }
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
+
+            // Displays selected event details if available.
             event?.let {
+
                 EventSummaryCard(
                     eventName = it.eventName,
                     eventDate = it.eventDate
@@ -58,15 +68,20 @@ fun TransactionsScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
+
+            // Section title.
             ScreenHeader("Transactions history")
 
             Spacer(modifier = Modifier.height(16.dp))
 
             when {
+
+                // Loading state.
                 isLoading -> {
                     Text("Loading transactions history...")
                 }
 
+                // Error state.
                 errorMessage != null -> {
                     Text(
                         text = errorMessage,
@@ -74,6 +89,7 @@ fun TransactionsScreen(
                     )
                 }
 
+                // Empty state if no transactions exist.
                 transactions.isEmpty() -> {
                     EmptyState(
                         title = "No transactions yet",
@@ -82,22 +98,33 @@ fun TransactionsScreen(
                     )
                 }
 
+                // Displays newest recorded sales for the selected event.
                 else -> {
+
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
+
                         items(transactions) { transaction ->
+
+                            // Card showing one transaction.
                             Card(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
+
                                 Column(
                                     modifier = Modifier.padding(16.dp)
                                 ) {
+
+                                    // Transaction identifier.
                                     Text(
                                         text = "Transaction #${transaction.transactionId}",
                                         style = MaterialTheme.typography.titleMedium
                                     )
+
                                     Spacer(modifier = Modifier.height(4.dp))
+
+                                    // Transaction details.
                                     Text(text = "Quantity Sold: ${transaction.quantitySold}")
                                     Text(text = "Sale Price: €${transaction.salePrice}")
                                     Text(text = "Time: ${transaction.saleTime}")

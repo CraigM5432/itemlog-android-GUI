@@ -7,27 +7,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.AddItemViewModel
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.KeyboardType
 
+// Screen for adding a new merchandise item to the selected event.
 @Composable
 fun AddItemScreen(
     eventId: Long,
@@ -40,6 +37,7 @@ fun AddItemScreen(
     var size by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
 
+    // ViewModel handles validation and API call.
     val viewModel: AddItemViewModel = viewModel()
 
     Scaffold(
@@ -47,6 +45,7 @@ fun AddItemScreen(
             SimpleTopBar("Add Item")
         }
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -59,6 +58,7 @@ fun AddItemScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Item name input.
             OutlinedTextField(
                 value = itemName,
                 onValueChange = { itemName = it },
@@ -68,6 +68,7 @@ fun AddItemScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Price input.
             OutlinedTextField(
                 value = price,
                 onValueChange = { price = it },
@@ -78,6 +79,7 @@ fun AddItemScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Quantity input.
             OutlinedTextField(
                 value = quantity,
                 onValueChange = { quantity = it },
@@ -88,6 +90,7 @@ fun AddItemScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Optional size input.
             OutlinedTextField(
                 value = size,
                 onValueChange = { size = it },
@@ -97,6 +100,7 @@ fun AddItemScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Optional description input.
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
@@ -104,6 +108,7 @@ fun AddItemScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            // Displays validation/API errors.
             viewModel.errorMessage.value?.let {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -114,6 +119,7 @@ fun AddItemScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Creates the item.
             Button(
                 onClick = {
                     viewModel.createItem(
@@ -134,6 +140,7 @@ fun AddItemScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Cancels and returns to previous screen.
             TextButton(onClick = onCancelClick) {
                 Text("Cancel")
             }

@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.craigmurphy.itemlog.data.repository.EventRepository
 import kotlinx.coroutines.launch
 
+// ViewModel for editing an existing item.
+// Reuses item validation before sending updated values to the backend.
 class EditItemViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = EventRepository(application)
@@ -37,27 +39,15 @@ class EditItemViewModel(application: Application) : AndroidViewModel(application
                 return@launch
             }
 
-            if (parsedPrice == null) {
+            if (parsedPrice == null || parsedPrice <= 0.0) {
                 isLoading.value = false
                 errorMessage.value = "Enter a valid price."
                 return@launch
             }
 
-            if (parsedPrice <= 0.0) {
-                isLoading.value = false
-                errorMessage.value = "Price must be greater than 0."
-                return@launch
-            }
-
-            if (parsedQuantity == null) {
+            if (parsedQuantity == null || parsedQuantity < 0) {
                 isLoading.value = false
                 errorMessage.value = "Enter a valid quantity."
-                return@launch
-            }
-
-            if (parsedQuantity < 0) {
-                isLoading.value = false
-                errorMessage.value = "Quantity cannot be negative."
                 return@launch
             }
 

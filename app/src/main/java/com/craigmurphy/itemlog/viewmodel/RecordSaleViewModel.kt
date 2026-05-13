@@ -8,13 +8,14 @@ import com.craigmurphy.itemlog.data.model.ItemResponse
 import com.craigmurphy.itemlog.data.repository.EventRepository
 import kotlinx.coroutines.launch
 
+// ViewModel for recording item sales.
+// Loads available items, validates sale input and sends transaction requests to the backend.
 class RecordSaleViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = EventRepository(application)
 
     var items = mutableStateOf<List<ItemResponse>>(emptyList())
     var isLoadingItems = mutableStateOf(false)
-
     var isSaving = mutableStateOf(false)
     var errorMessage = mutableStateOf<String?>(null)
 
@@ -55,30 +56,19 @@ class RecordSaleViewModel(application: Application) : AndroidViewModel(applicati
                 return@launch
             }
 
-            if (parsedQuantitySold == null) {
+            if (parsedQuantitySold == null || parsedQuantitySold <= 0) {
                 isSaving.value = false
                 errorMessage.value = "Enter a valid quantity sold."
                 return@launch
             }
 
-            if (parsedQuantitySold <= 0) {
-                isSaving.value = false
-                errorMessage.value = "Quantity sold must be greater than 0."
-                return@launch
-            }
-
-            if (parsedSalePrice == null) {
+            if (parsedSalePrice == null || parsedSalePrice <= 0.0) {
                 isSaving.value = false
                 errorMessage.value = "Enter a valid sale price."
                 return@launch
             }
 
-            if (parsedSalePrice <= 0.0) {
-                isSaving.value = false
-                errorMessage.value = "Sale price must be greater than 0."
-                return@launch
-            }
-
+            // Local stock check improves user feedback; the backend also enforces stock validation.
             val selectedItem = items.value.find { it.itemId == selectedItemId }
             if (selectedItem != null && parsedQuantitySold > selectedItem.quantity) {
                 isSaving.value = false

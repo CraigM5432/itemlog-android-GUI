@@ -22,11 +22,17 @@ import com.craigmurphy.itemlog.ui.screens.SplashScreen
 import com.craigmurphy.itemlog.ui.screens.ExportCsvScreen
 import com.craigmurphy.itemlog.ui.screens.EditItemScreen
 
+// Authentication and startup routes.
+// Main navigation graph for the app.
+// Controls screen flow, session-based redirects and route arguments.
 @Composable
 fun AppNavGraph() {
+
     val navController = rememberNavController()
     val sessionViewModel: SessionViewModel = viewModel()
 
+    // If the session becomes unauthenticated, clear navigation history
+    // and return the user to the login screen.
     LaunchedEffect(sessionViewModel.authState.value) {
         if (sessionViewModel.authState.value is AuthState.Unauthenticated) {
             navController.navigate(Routes.LOGIN) {
@@ -34,30 +40,34 @@ fun AppNavGraph() {
             }
         }
     }
-
+    // Main event list route.
     NavHost(
         navController = navController,
         startDestination = Routes.SPLASH
+    ) {
 
-    ) {composable(Routes.SPLASH) {
-        SplashScreen()
+        composable(Routes.SPLASH) {
+            SplashScreen()
 
-        LaunchedEffect(Unit) {
-            if (sessionViewModel.isLoggedIn()) {
-                navController.navigate(Routes.EVENTS) {
-                    popUpTo(Routes.SPLASH) { inclusive = true }
-                }
-            } else {
-                navController.navigate(Routes.LOGIN) {
-                    popUpTo(Routes.SPLASH) { inclusive = true }
+            // Checks for an existing token on launch and routes the user accordingly.
+            LaunchedEffect(Unit) {
+                if (sessionViewModel.isLoggedIn()) {
+                    navController.navigate(Routes.EVENTS) {
+                        popUpTo(Routes.SPLASH) { inclusive = true }
+                    }
+                } else {
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(Routes.SPLASH) { inclusive = true }
+                    }
                 }
             }
         }
-    }
+
         composable(Routes.LOGIN) {
             LoginScreen(
                 onLoginClick = {
                     sessionViewModel.onLoginSuccess()
+
                     navController.navigate(Routes.EVENTS) {
                         popUpTo(Routes.LOGIN) { inclusive = true }
                     }
@@ -78,7 +88,7 @@ fun AppNavGraph() {
                 }
             )
         }
-
+        // Item management routes for the selected event.
         composable(Routes.EVENTS) { backStackEntry ->
             val refreshEvents =
                 backStackEntry.savedStateHandle.get<Boolean>("refresh_events") ?: false
@@ -127,7 +137,7 @@ fun AppNavGraph() {
                 }
             )
         }
-
+        // Sales, transaction history and CSV export routes.
         composable(
             route = Routes.ITEMS,
             arguments = listOf(navArgument("eventId") { type = NavType.LongType })

@@ -8,6 +8,8 @@ import com.craigmurphy.itemlog.data.model.EventResponse
 import com.craigmurphy.itemlog.data.repository.EventRepository
 import kotlinx.coroutines.launch
 
+// ViewModel for the events list screen.
+// Loads events for the authenticated user and detects expired/invalid sessions.
 class EventsViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = EventRepository(application)
@@ -15,6 +17,8 @@ class EventsViewModel(application: Application) : AndroidViewModel(application) 
     var events = mutableStateOf<List<EventResponse>>(emptyList())
     var isLoading = mutableStateOf(false)
     var errorMessage = mutableStateOf<String?>(null)
+
+    // Used by the screen to trigger logout/session-expired handling when the backend returns 401.
     var unauthorized = mutableStateOf(false)
 
     fun loadEvents() {

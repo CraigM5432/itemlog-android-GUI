@@ -1,3 +1,5 @@
+// Controls Gradle plugin repositories and project modules.
+
 pluginManagement {
     repositories {
         google {

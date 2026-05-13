@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.craigmurphy.itemlog.data.repository.EventRepository
 import kotlinx.coroutines.launch
 
+// ViewModel for creating events.
+// Validates event input and sends the create request to the backend.
 class CreateEventViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = EventRepository(application)
@@ -29,12 +31,7 @@ class CreateEventViewModel(application: Application) : AndroidViewModel(applicat
                 return@launch
             }
 
-            if (eventDate.isBlank()) {
-                isLoading.value = false
-                errorMessage.value = "Event date is required."
-                return@launch
-            }
-
+            // Matches the backend's expected LocalDate format.
             val dateRegex = Regex("""\d{4}-\d{2}-\d{2}""")
             if (!dateRegex.matches(eventDate)) {
                 isLoading.value = false
@@ -42,7 +39,7 @@ class CreateEventViewModel(application: Application) : AndroidViewModel(applicat
                 return@launch
             }
 
-            val result = repository.createEvent(eventName, eventDate)
+            val result = repository.createEvent(eventName.trim(), eventDate)
 
             isLoading.value = false
 

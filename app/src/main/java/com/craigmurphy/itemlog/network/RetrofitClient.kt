@@ -8,10 +8,13 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
+// Creates the Retrofit API client used by the Android app.
+// Automatically attaches the stored JWT token to protected backend requests.
 object RetrofitClient {
 
-    private const val BASE_URL = "http://10.0.2.2:8080/"
+    private const val BASE_URL = "https://itemlog-production.up.railway.app/"
 
+    // Useful during development, but should be reduced or disabled for production releases.
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
@@ -23,12 +26,12 @@ object RetrofitClient {
             .addInterceptor { chain ->
                 val originalRequest = chain.request()
                 val requestBuilder = originalRequest.newBuilder()
-
                 val path = originalRequest.url.encodedPath
 
-                // NOT attaching token to public auth endpoints
+                // Auth endpoints are public, so the JWT is only added to protected routes.
                 if (!path.startsWith("/auth/")) {
                     val token = tokenManager.getToken()
+
                     if (!token.isNullOrBlank()) {
                         requestBuilder.addHeader("Authorization", "Bearer $token")
                     }
@@ -44,8 +47,13 @@ object RetrofitClient {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(getClient(context))
+
+            // Scalars handles plain text responses such as CSV exports.
             .addConverterFactory(ScalarsConverterFactory.create())
+
+            // Gson handles JSON request and response bodies.
             .addConverterFactory(GsonConverterFactory.create())
+
             .build()
             .create(ApiService::class.java)
     }

@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 
+// Handles secure local storage of the JWT token.
+// EncryptedSharedPreferences is used so the token is not stored in plain text.
 class TokenManager(context: Context) {
 
     private val prefs = EncryptedSharedPreferences.create(

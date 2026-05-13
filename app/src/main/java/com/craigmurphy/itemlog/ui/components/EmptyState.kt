@@ -11,19 +11,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+// Reusable empty-state component shown when lists contain no data.
+// Example: no events, no items, or no transactions.
 @Composable
 fun EmptyState(
     title: String,
     message: String,
     symbol: String = "📭"
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 24.dp),
+
+        // Centers content.
         verticalArrangement = Arrangement.Center,
+
+        // Centers content.
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         Text(
             text = symbol,
             style = MaterialTheme.typography.headlineLarge

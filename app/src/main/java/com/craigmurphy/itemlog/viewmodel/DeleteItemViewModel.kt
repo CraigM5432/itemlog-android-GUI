@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.craigmurphy.itemlog.data.repository.EventRepository
 import kotlinx.coroutines.launch
 
+// ViewModel responsible for item deletion.
+// Backend business logic decides whether deletion is allowed.
 class DeleteItemViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = EventRepository(application)

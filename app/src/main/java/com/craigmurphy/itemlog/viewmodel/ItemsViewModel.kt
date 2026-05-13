@@ -9,6 +9,8 @@ import com.craigmurphy.itemlog.data.model.ItemResponse
 import com.craigmurphy.itemlog.data.repository.EventRepository
 import kotlinx.coroutines.launch
 
+// ViewModel for the items screen.
+// Loads the selected event context and all items belonging to that event.
 class ItemsViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = EventRepository(application)

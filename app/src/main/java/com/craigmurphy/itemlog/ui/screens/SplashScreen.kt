@@ -13,13 +13,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+// Splash screen shown when the app launches.
+// This screen appears briefly while the app checks whether a JWT token exists.
 @Composable
 fun SplashScreen() {
+
     Column(
         modifier = Modifier.fillMaxSize(),
+
+        // Centers content vertically.
         verticalArrangement = Arrangement.Center,
+
+        // Centers content horizontally.
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        // App title/logo text.
         Text(
             text = "ItemLog",
             style = MaterialTheme.typography.headlineLarge
@@ -27,6 +36,7 @@ fun SplashScreen() {
 
         Spacer(modifier = Modifier.height(12.dp))
 
+        // Short app description.
         Text(
             text = "Event sales and inventory tracking",
             style = MaterialTheme.typography.bodyMedium
@@ -34,6 +44,7 @@ fun SplashScreen() {
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // Loading spinner shown while navigation/authentication state is checked.
         CircularProgressIndicator()
     }
 }

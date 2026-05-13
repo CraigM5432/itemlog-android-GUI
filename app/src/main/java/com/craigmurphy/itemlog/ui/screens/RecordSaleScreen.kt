@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -15,35 +16,41 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.data.model.ItemResponse
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.RecordSaleViewModel
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.KeyboardType
+
+// Screen used to record merchandise sales for the selected event.
+// Users select an item, enter quantity sold and optionally adjust sale price.
 @Composable
 fun RecordSaleScreen(
     eventId: Long,
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
+    // Currently selected item from the dropdown.
     var selectedItem by remember { mutableStateOf<ItemResponse?>(null) }
+
+    // Quantity sold entered by user.
     var quantitySold by remember { mutableStateOf("") }
+
+    // Sale price entered by user.
     var salePrice by remember { mutableStateOf("") }
+
+    // Controls whether the dropdown menu is open.
     var expanded by remember { mutableStateOf(false) }
 
+    // ViewModel handles item loading and transaction creation.
     val viewModel: RecordSaleViewModel = viewModel()
 
+    // Loads event items when the screen opens.
     LaunchedEffect(eventId) {
         viewModel.loadItems(eventId)
     }
@@ -58,6 +65,7 @@ fun RecordSaleScreen(
             SimpleTopBar("Record Sale")
         }
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -80,6 +88,7 @@ fun RecordSaleScreen(
                 }
 
                 else -> {
+                    // Read-only field showing the selected item name.
                     OutlinedTextField(
                         value = selectedItem?.name ?: "",
                         onValueChange = {},
@@ -90,6 +99,7 @@ fun RecordSaleScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
+                    // Opens the item dropdown.
                     Button(
                         onClick = { expanded = true },
                         modifier = Modifier.fillMaxWidth()
@@ -97,6 +107,8 @@ fun RecordSaleScreen(
                         Text("Choose Item")
                     }
 
+                    // Dropdown menu listing event items.
+                    // Dropdown selection replaced manual item ID entry to improve usability.
                     DropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { expanded = false }
@@ -106,7 +118,10 @@ fun RecordSaleScreen(
                                 text = { Text("${item.name} (Stock: ${item.quantity})") },
                                 onClick = {
                                     selectedItem = item
+
+                                    // Defaults sale price to the item's current price.
                                     salePrice = item.price.toString()
+
                                     expanded = false
                                 }
                             )
@@ -117,6 +132,7 @@ fun RecordSaleScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Quantity sold input.
             OutlinedTextField(
                 value = quantitySold,
                 onValueChange = { quantitySold = it },
@@ -127,6 +143,7 @@ fun RecordSaleScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Sale price input.
             OutlinedTextField(
                 value = salePrice,
                 onValueChange = { salePrice = it },
@@ -135,6 +152,7 @@ fun RecordSaleScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
 
+            // Displays validation/API errors.
             errorMessage?.let {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -145,6 +163,8 @@ fun RecordSaleScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Saves the sale transaction.
+            // Backend also validates stock quantity to prevent overselling.
             Button(
                 onClick = {
                     viewModel.createTransaction(
@@ -157,6 +177,8 @@ fun RecordSaleScreen(
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
+
+                // Button is disabled if there are no items to sell.
                 enabled = items.isNotEmpty()
             ) {
                 Text(if (isSaving) "Saving..." else "Save Sale")
@@ -164,6 +186,7 @@ fun RecordSaleScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Cancels and returns to previous screen.
             TextButton(onClick = onCancelClick) {
                 Text("Cancel")
             }

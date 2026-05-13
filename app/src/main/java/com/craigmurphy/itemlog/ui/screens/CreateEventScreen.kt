@@ -13,11 +13,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -26,14 +22,19 @@ import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.CreateEventViewModel
 
+// Screen used to create a new event.
 @Composable
 fun CreateEventScreen(
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
+    // Stores event name typed by the user.
     var eventName by remember { mutableStateOf("") }
+
+    // Stores event date typed by the user.
     var eventDate by remember { mutableStateOf("") }
 
+    // ViewModel responsible for validation and API call.
     val viewModel: CreateEventViewModel = viewModel()
 
     Scaffold(
@@ -41,6 +42,7 @@ fun CreateEventScreen(
             SimpleTopBar("Create Event")
         }
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -53,6 +55,7 @@ fun CreateEventScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Event input.
             OutlinedTextField(
                 value = eventName,
                 onValueChange = { eventName = it },
@@ -62,6 +65,7 @@ fun CreateEventScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Event input.
             OutlinedTextField(
                 value = eventDate,
                 onValueChange = { eventDate = it },
@@ -69,6 +73,7 @@ fun CreateEventScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            // Displays validation /API errors.
             viewModel.errorMessage.value?.let {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -79,6 +84,7 @@ fun CreateEventScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Saves the event by calling the ViewModel.
             Button(
                 onClick = {
                     viewModel.createEvent(eventName, eventDate) {
@@ -92,6 +98,7 @@ fun CreateEventScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Cancels event creation and returns to previous screen.
             TextButton(onClick = onCancelClick) {
                 Text("Cancel")
             }

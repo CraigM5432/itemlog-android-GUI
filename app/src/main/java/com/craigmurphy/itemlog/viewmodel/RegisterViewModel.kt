@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.craigmurphy.itemlog.data.repository.AuthRepository
 import kotlinx.coroutines.launch
 
+// ViewModel for the registration screen.
+// Performs client-side validation before sending registration details to the backend.
 class RegisterViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = AuthRepository(application)
@@ -24,6 +26,7 @@ class RegisterViewModel(application: Application) : AndroidViewModel(application
             isLoading.value = true
             errorMessage.value = null
 
+            // Basic client-side validation improves usability before backend validation runs.
             if (username.isBlank()) {
                 isLoading.value = false
                 errorMessage.value = "Username is required."
@@ -40,12 +43,6 @@ class RegisterViewModel(application: Application) : AndroidViewModel(application
             if (!emailRegex.matches(email)) {
                 isLoading.value = false
                 errorMessage.value = "Enter a valid email address."
-                return@launch
-            }
-
-            if (password.isBlank()) {
-                isLoading.value = false
-                errorMessage.value = "Password is required."
                 return@launch
             }
 

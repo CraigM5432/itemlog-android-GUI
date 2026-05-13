@@ -12,17 +12,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+// Reusable summary card showing the currently selected event context.
 @Composable
 fun EventSummaryCard(
     eventName: String,
     eventDate: String
 ) {
+
     Card(
         modifier = Modifier.fillMaxWidth()
     ) {
+
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
+
+            // Event name displayed
             Text(
                 text = eventName,
                 style = MaterialTheme.typography.titleLarge
@@ -30,6 +35,7 @@ fun EventSummaryCard(
 
             Spacer(modifier = Modifier.height(6.dp))
 
+            // Event date displayed
             Text(
                 text = "Date: $eventDate",
                 style = MaterialTheme.typography.bodyMedium

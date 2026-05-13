@@ -8,6 +8,8 @@ import com.craigmurphy.itemlog.data.model.EventResponse
 import com.craigmurphy.itemlog.data.repository.EventRepository
 import kotlinx.coroutines.launch
 
+// ViewModel for CSV export.
+// Loads CSV text from the backend and event context for display.
 class ExportCsvViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = EventRepository(application)

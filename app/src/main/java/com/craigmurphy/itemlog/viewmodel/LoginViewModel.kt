@@ -8,6 +8,9 @@ import com.craigmurphy.itemlog.data.local.TokenManager
 import com.craigmurphy.itemlog.data.repository.AuthRepository
 import kotlinx.coroutines.launch
 
+// ViewModel for the LoginScreen.
+// ViewModel for the login screen.
+// Validates login input, calls the backend, and stores the JWT after successful authentication.
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = AuthRepository(application)
@@ -25,6 +28,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             isLoading.value = true
             errorMessage.value = null
 
+            // Frontend validation prevents unnecessary API requests with empty credentials.
             if (username.isBlank()) {
                 isLoading.value = false
                 errorMessage.value = "Username is required."
@@ -42,10 +46,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             isLoading.value = false
 
             if (result.isSuccess) {
-                val token = result.getOrNull()?.token
-                if (token != null) {
-                    tokenManager.saveToken(token)
-                }
+                result.getOrNull()?.token?.let { tokenManager.saveToken(it) }
                 onSuccess()
             } else {
                 errorMessage.value = result.exceptionOrNull()?.message

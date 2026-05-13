@@ -14,11 +14,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -29,6 +25,8 @@ import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.EditItemViewModel
 import java.net.URLDecoder
 
+// Screen for editing an existing merchandise item.
+// Existing item values are passed through navigation arguments.
 @Composable
 fun EditItemScreen(
     eventId: Long,
@@ -41,12 +39,15 @@ fun EditItemScreen(
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
+    // Initial values are passed through navigation route arguments.
+    // URLDecoder converts encoded text back to normal text.
     var itemName by remember { mutableStateOf(URLDecoder.decode(initialName, "UTF-8")) }
     var price by remember { mutableStateOf(initialPrice) }
     var quantity by remember { mutableStateOf(initialQuantity) }
     var size by remember { mutableStateOf(URLDecoder.decode(initialSize, "UTF-8")) }
     var description by remember { mutableStateOf(URLDecoder.decode(initialDescription, "UTF-8")) }
 
+    // ViewModel handles validation and update API call.
     val viewModel: EditItemViewModel = viewModel()
 
     Scaffold(
@@ -54,6 +55,7 @@ fun EditItemScreen(
             SimpleTopBar("Edit Item")
         }
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -66,6 +68,7 @@ fun EditItemScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Item name input.
             OutlinedTextField(
                 value = itemName,
                 onValueChange = { itemName = it },
@@ -75,6 +78,7 @@ fun EditItemScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Price input.
             OutlinedTextField(
                 value = price,
                 onValueChange = { price = it },
@@ -85,6 +89,7 @@ fun EditItemScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Quantity input.
             OutlinedTextField(
                 value = quantity,
                 onValueChange = { quantity = it },
@@ -95,6 +100,7 @@ fun EditItemScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Size input.
             OutlinedTextField(
                 value = size,
                 onValueChange = { size = it },
@@ -104,6 +110,7 @@ fun EditItemScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Description input.
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
@@ -111,6 +118,7 @@ fun EditItemScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            // Displays validation/API errors.
             viewModel.errorMessage.value?.let {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -121,6 +129,7 @@ fun EditItemScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Saves item changes.
             Button(
                 onClick = {
                     viewModel.updateItem(
@@ -142,6 +151,7 @@ fun EditItemScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Cancels and returns to previous screen.
             TextButton(onClick = onCancelClick) {
                 Text("Cancel")
             }

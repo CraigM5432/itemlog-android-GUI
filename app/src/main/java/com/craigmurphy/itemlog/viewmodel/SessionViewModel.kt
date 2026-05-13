@@ -6,6 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import com.craigmurphy.itemlog.data.local.TokenManager
 import com.craigmurphy.itemlog.session.AuthState
 
+// Tracks the user's login session across the app.
+// Handles logout, session restoration and expired-token behaviour.
 class SessionViewModel(application: Application) : AndroidViewModel(application) {
 
     private val tokenManager = TokenManager(application)
@@ -27,6 +29,7 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
         return !tokenManager.getToken().isNullOrBlank()
     }
 
+    // Called when the backend rejects a request with 401 Unauthorized.
     fun handleUnauthorized() {
         tokenManager.clearToken()
         authState.value = AuthState.Unauthenticated

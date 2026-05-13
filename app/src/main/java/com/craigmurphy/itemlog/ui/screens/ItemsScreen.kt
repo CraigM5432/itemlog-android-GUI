@@ -16,29 +16,25 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.data.model.ItemResponse
+import com.craigmurphy.itemlog.ui.components.EmptyState
+import com.craigmurphy.itemlog.ui.components.EventSummaryCard
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.DeleteItemViewModel
 import com.craigmurphy.itemlog.viewmodel.ItemsViewModel
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
-import com.craigmurphy.itemlog.ui.components.EventSummaryCard
-import com.craigmurphy.itemlog.ui.components.EmptyState
 
+// Item management screen for a selected event.
+// Allows users to view, add, edit, delete items, record sales, view transactions and export CSV.
 @Composable
 fun ItemsScreen(
     eventId: Long,
@@ -52,17 +48,29 @@ fun ItemsScreen(
     onEditItemClick: (ItemResponse) -> Unit,
     onItemDeleted: () -> Unit
 ) {
+    // ViewModel for loading event and item data.
     val viewModel: ItemsViewModel = viewModel()
+
+    // Separate ViewModel for item deletion.
     val deleteViewModel: DeleteItemViewModel = viewModel()
 
+    // Stores the item currently waiting for delete confirmation.
     var itemPendingDelete by remember { mutableStateOf<ItemResponse?>(null) }
+
+    // Snackbar state for showing temporary messages.
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Coroutine scope used to show snackbar messages after deletion.
     val coroutineScope = rememberCoroutineScope()
+
     val event = viewModel.event.value
 
+    // Reloads items whenever the event ID or refresh trigger changes.
     LaunchedEffect(eventId, refreshTrigger) {
         viewModel.loadItems(eventId)
     }
+
+    // Shows messages passed from other screens.
     LaunchedEffect(message) {
         if (!message.isNullOrBlank()) {
             snackbarHostState.showSnackbar(message)
@@ -83,12 +91,14 @@ fun ItemsScreen(
             SnackbarHost(hostState = snackbarHostState)
         }
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
+            // Displays selected event summary when available.
             event?.let {
                 EventSummaryCard(
                     eventName = it.eventName,
@@ -97,6 +107,8 @@ fun ItemsScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
+
+            // Displays action buttons.
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -140,6 +152,7 @@ fun ItemsScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Shows delete-related errors.
             deleteErrorMessage?.let {
                 Text(
                     text = it,
@@ -173,6 +186,8 @@ fun ItemsScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(items) { item ->
+
+                            // Card displaying one item.
                             Card(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
@@ -217,6 +232,7 @@ fun ItemsScreen(
         }
     }
 
+    // Confirmation dialog prevents accidental item deletion.
     itemPendingDelete?.let { item ->
         AlertDialog(
             onDismissRequest = {
@@ -234,6 +250,7 @@ fun ItemsScreen(
                         deleteViewModel.deleteItem(eventId, item.itemId) {
                             itemPendingDelete = null
                             onItemDeleted()
+
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar("Item deleted successfully.")
                             }

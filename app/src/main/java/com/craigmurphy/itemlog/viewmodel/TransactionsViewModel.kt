@@ -9,6 +9,8 @@ import com.craigmurphy.itemlog.data.model.TransactionResponse
 import com.craigmurphy.itemlog.data.repository.EventRepository
 import kotlinx.coroutines.launch
 
+// ViewModel for transaction history.
+// Loads transactions and event context for the selected event.
 class TransactionsViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = EventRepository(application)
