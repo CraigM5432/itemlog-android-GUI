@@ -61,4 +61,5 @@ dependencies {
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("com.squareup.retrofit2:converter-scalars:2.11.0")
     implementation("androidx.compose.ui:ui-text")
+    implementation("androidx.compose.material:material-icons-extended")
 }

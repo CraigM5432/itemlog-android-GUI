@@ -5,5 +5,6 @@ data class TransactionResponse(
     val transactionId: Long,
     val quantitySold: Int,
     val salePrice: Double,
+    val paymentMethod: String,
     val saleTime: String
 )

@@ -21,6 +21,8 @@ import com.craigmurphy.itemlog.session.AuthState
 import com.craigmurphy.itemlog.ui.screens.SplashScreen
 import com.craigmurphy.itemlog.ui.screens.ExportCsvScreen
 import com.craigmurphy.itemlog.ui.screens.EditItemScreen
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 
 // Authentication and startup routes.
 // Main navigation graph for the app.
@@ -145,8 +147,9 @@ fun AppNavGraph() {
             val eventId = backStackEntry.arguments?.getLong("eventId") ?: 0L
             val refreshItems =
                 backStackEntry.savedStateHandle.get<Boolean>("refresh_items") ?: false
-            val itemsMessage =
-                backStackEntry.savedStateHandle.get<String>("items_message")
+            val itemsMessage by backStackEntry.savedStateHandle
+                .getStateFlow<String?>("items_message", null)
+                .collectAsState()
 
             ItemsScreen(
                 eventId = eventId,
@@ -255,7 +258,14 @@ fun AppNavGraph() {
             val eventId = backStackEntry.arguments?.getLong("eventId") ?: 0L
 
             ExportCsvScreen(
-                eventId = eventId
+                eventId = eventId,
+                onExportComplete = {
+                    navController.popBackStack()
+
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("items_message", "CSV exported successfully.")
+                }
             )
         }
         composable(

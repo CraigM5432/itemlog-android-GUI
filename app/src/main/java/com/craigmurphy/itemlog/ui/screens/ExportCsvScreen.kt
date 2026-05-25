@@ -34,7 +34,8 @@ import java.io.File
 // Retrieves transaction history as CSV text and allows secure file sharing through Android FileProvider.
 @Composable
 fun ExportCsvScreen(
-    eventId: Long
+    eventId: Long,
+    onExportComplete: () -> Unit
 ) {
     val viewModel: ExportCsvViewModel = viewModel()
     val context = LocalContext.current
@@ -81,7 +82,7 @@ fun ExportCsvScreen(
             }
 
             // Section title.
-            ScreenHeader("Transactions CSV")
+            ScreenHeader("Export Transactions")
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -161,6 +162,7 @@ fun ExportCsvScreen(
                             context.startActivity(
                                 Intent.createChooser(shareIntent, "Share CSV")
                             )
+                            onExportComplete()
                         },
 
                         modifier = Modifier.fillMaxWidth()
@@ -171,9 +173,8 @@ fun ExportCsvScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Displays CSV preview text directly on screen.
                     Text(
-                        text = csvContent,
+                        text = "CSV export is ready. Tap the button above to share or save the file.",
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.fillMaxWidth()
                     )

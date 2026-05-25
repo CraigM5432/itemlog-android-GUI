@@ -14,7 +14,6 @@ object RetrofitClient {
 
     private const val BASE_URL = "https://itemlog-production.up.railway.app/"
 
-    // Useful during development, but should be reduced or disabled for production releases.
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }

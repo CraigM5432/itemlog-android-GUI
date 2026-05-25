@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -26,9 +25,13 @@ import com.craigmurphy.itemlog.data.model.ItemResponse
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.RecordSaleViewModel
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 
 // Screen used to record merchandise sales for the selected event.
 // Users select an item, enter quantity sold and optionally adjust sale price.
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecordSaleScreen(
     eventId: Long,
@@ -43,6 +46,11 @@ fun RecordSaleScreen(
 
     // Sale price entered by user.
     var salePrice by remember { mutableStateOf("") }
+
+    var selectedPaymentMethod by remember { mutableStateOf("CASH") }
+    var paymentDropdownExpanded by remember { mutableStateOf(false) }
+
+    val paymentMethods = listOf("CASH", "CARD", "REVOLUT")
 
     // Controls whether the dropdown menu is open.
     var expanded by remember { mutableStateOf(false) }
@@ -89,42 +97,43 @@ fun RecordSaleScreen(
 
                 else -> {
                     // Read-only field showing the selected item name.
-                    OutlinedTextField(
-                        value = selectedItem?.name ?: "",
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Selected Item") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Opens the item dropdown.
-                    Button(
-                        onClick = { expanded = true },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Choose Item")
-                    }
-
-                    // Dropdown menu listing event items.
-                    // Dropdown selection replaced manual item ID entry to improve usability.
-                    DropdownMenu(
+                    ExposedDropdownMenuBox(
                         expanded = expanded,
-                        onDismissRequest = { expanded = false }
+                        onExpandedChange = {
+                            expanded = !expanded
+                        }
                     ) {
-                        items.forEach { item ->
-                            DropdownMenuItem(
-                                text = { Text("${item.name} (Stock: ${item.quantity})") },
-                                onClick = {
-                                    selectedItem = item
+                        OutlinedTextField(
+                            value = selectedItem?.name ?: "",
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Choose Item") },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                            },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
+                        )
 
-                                    // Defaults sale price to the item's current price.
-                                    salePrice = item.price.toString()
-
-                                    expanded = false
-                                }
-                            )
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = {
+                                expanded = false
+                            }
+                        ) {
+                            items.forEach { item ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text("${item.name} - €${item.price} (Stock: ${item.quantity})")
+                                    },
+                                    onClick = {
+                                        selectedItem = item
+                                        salePrice = item.price.toString()
+                                        expanded = false
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -152,6 +161,47 @@ fun RecordSaleScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
 
+            Spacer(modifier = Modifier.height(12.dp))
+
+            ExposedDropdownMenuBox(
+                expanded = paymentDropdownExpanded,
+                onExpandedChange = {
+                    paymentDropdownExpanded = !paymentDropdownExpanded
+                }
+            ) {
+                OutlinedTextField(
+                    value = selectedPaymentMethod,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Payment Method") },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = paymentDropdownExpanded
+                        )
+                    },
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = paymentDropdownExpanded,
+                    onDismissRequest = {
+                        paymentDropdownExpanded = false
+                    }
+                ) {
+                    paymentMethods.forEach { method ->
+                        DropdownMenuItem(
+                            text = { Text(method) },
+                            onClick = {
+                                selectedPaymentMethod = method
+                                paymentDropdownExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
             // Displays validation/API errors.
             errorMessage?.let {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -171,7 +221,8 @@ fun RecordSaleScreen(
                         eventId = eventId,
                         selectedItemId = selectedItem?.itemId,
                         quantitySold = quantitySold,
-                        salePrice = salePrice
+                        salePrice = salePrice,
+                        paymentMethod = selectedPaymentMethod
                     ) {
                         onSaveClick()
                     }

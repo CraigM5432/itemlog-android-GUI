@@ -8,7 +8,6 @@ import com.craigmurphy.itemlog.data.local.TokenManager
 import com.craigmurphy.itemlog.data.repository.AuthRepository
 import kotlinx.coroutines.launch
 
-// ViewModel for the LoginScreen.
 // ViewModel for the login screen.
 // Validates login input, calls the backend, and stores the JWT after successful authentication.
 class LoginViewModel(application: Application) : AndroidViewModel(application) {

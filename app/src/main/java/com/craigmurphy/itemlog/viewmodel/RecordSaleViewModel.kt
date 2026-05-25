@@ -41,6 +41,7 @@ class RecordSaleViewModel(application: Application) : AndroidViewModel(applicati
         selectedItemId: Long?,
         quantitySold: String,
         salePrice: String,
+        paymentMethod: String,
         onSuccess: () -> Unit
     ) {
         viewModelScope.launch {
@@ -67,6 +68,11 @@ class RecordSaleViewModel(application: Application) : AndroidViewModel(applicati
                 errorMessage.value = "Enter a valid sale price."
                 return@launch
             }
+            if (paymentMethod.isBlank()) {
+                isSaving.value = false
+                errorMessage.value = "Please select a payment method."
+                return@launch
+            }
 
             // Local stock check improves user feedback; the backend also enforces stock validation.
             val selectedItem = items.value.find { it.itemId == selectedItemId }
@@ -80,7 +86,8 @@ class RecordSaleViewModel(application: Application) : AndroidViewModel(applicati
                 eventId = eventId,
                 itemId = selectedItemId,
                 quantitySold = parsedQuantitySold,
-                salePrice = parsedSalePrice
+                salePrice = parsedSalePrice,
+                paymentMethod = paymentMethod
             )
 
             isSaving.value = false

@@ -21,10 +21,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.RegisterViewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.text.input.VisualTransformation
 
 // Registration screen.
 // Collects new user details and delegates account creation to RegisterViewModel.
@@ -37,6 +42,7 @@ fun RegisterScreen(
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
 
     val viewModel: RegisterViewModel = viewModel()
 
@@ -95,44 +101,33 @@ fun RegisterScreen(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Password") },
-
-                // Hides typed password characters.
-                visualTransformation = PasswordVisualTransformation(),
-
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            // Displays validation/API error messages.
-            viewModel.errorMessage.value?.let {
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Register button.
-            Button(
-                onClick = {
-
-                    // Calls ViewModel registration function.
-                    viewModel.register(username, email, password) {
-
-                        // Triggered after successful registration.
-                        onRegisterClick()
+                visualTransformation = if (passwordVisible) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            passwordVisible = !passwordVisible
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (passwordVisible) {
+                                Icons.Filled.VisibilityOff
+                            } else {
+                                Icons.Filled.Visibility
+                            },
+                            contentDescription = if (passwordVisible) {
+                                "Hide password"
+                            } else {
+                                "Show password"
+                            }
+                        )
                     }
                 },
-
                 modifier = Modifier.fillMaxWidth()
-            ) {
-
-                // Changes button text while loading.
-                Text(if (viewModel.isLoading.value) "Registering..." else "Register")
-            }
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
 

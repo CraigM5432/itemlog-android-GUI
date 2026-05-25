@@ -21,6 +21,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.VisualTransformation
 
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
@@ -40,6 +47,9 @@ fun LoginScreen(
     // State storing the password entered by the user.
     var password by remember { mutableStateOf("") }
 
+    var passwordVisible by remember { mutableStateOf(false) }
+
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val viewModel: LoginViewModel = viewModel()
 
@@ -90,15 +100,33 @@ fun LoginScreen(
             // Password input field.
             OutlinedTextField(
                 value = password,
-
-                // Updates password state when user types.
                 onValueChange = { password = it },
-
                 label = { Text("Password") },
-
-                // Hides typed password characters.
-                visualTransformation = PasswordVisualTransformation(),
-
+                visualTransformation = if (passwordVisible) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            passwordVisible = !passwordVisible
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (passwordVisible) {
+                                Icons.Filled.VisibilityOff
+                            } else {
+                                Icons.Filled.Visibility
+                            },
+                            contentDescription = if (passwordVisible) {
+                                "Hide password"
+                            } else {
+                                "Show password"
+                            }
+                        )
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -118,11 +146,9 @@ fun LoginScreen(
             // Login button.
             Button(
                 onClick = {
+                    keyboardController?.hide()
 
-                    // On success, navigation is handled by AppNavGraph.
                     viewModel.login(username, password) {
-
-
                         onLoginClick()
                     }
                 },

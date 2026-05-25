@@ -130,7 +130,8 @@ class EventRepository(private val context: Context) {
         eventId: Long,
         itemId: Long,
         quantitySold: Int,
-        salePrice: Double
+        salePrice: Double,
+        paymentMethod: String
     ): Result<TransactionResponse> {
 
         return try {
@@ -141,7 +142,8 @@ class EventRepository(private val context: Context) {
                 request = CreateTransactionRequest(
                     itemId = itemId,
                     quantitySold = quantitySold,
-                    salePrice = salePrice
+                    salePrice = salePrice,
+                    paymentMethod = paymentMethod
                 )
             )
 
