@@ -81,13 +81,13 @@ class RecordSaleViewModel(application: Application) : AndroidViewModel(applicati
                 errorMessage.value = "Not enough stock available."
                 return@launch
             }
-
+            println("DEBUG PAYMENT METHOD SENT: $paymentMethod")
             val result = repository.createTransaction(
                 eventId = eventId,
                 itemId = selectedItemId,
                 quantitySold = parsedQuantitySold,
                 salePrice = parsedSalePrice,
-                paymentMethod = paymentMethod
+                paymentMethod = paymentMethod,
             )
 
             isSaving.value = false
