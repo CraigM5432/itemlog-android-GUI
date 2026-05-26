@@ -126,7 +126,8 @@ fun RegisterScreen(
                         )
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !viewModel.isLoading.value
             )
 
             Spacer(modifier = Modifier.height(12.dp))

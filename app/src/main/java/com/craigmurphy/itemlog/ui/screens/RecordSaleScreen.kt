@@ -233,7 +233,7 @@ fun RecordSaleScreen(
                 modifier = Modifier.fillMaxWidth(),
 
                 // Button is disabled if there are no items to sell.
-                enabled = items.isNotEmpty()
+                enabled = items.isNotEmpty() && !isSaving
             ) {
                 Text(if (isSaving) "Saving..." else "Save Sale")
             }

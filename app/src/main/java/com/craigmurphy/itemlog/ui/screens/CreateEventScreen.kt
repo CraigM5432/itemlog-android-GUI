@@ -95,7 +95,8 @@ fun CreateEventScreen(
                         onSaveClick()
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !viewModel.isLoading.value
             ) {
                 Text(if (viewModel.isLoading.value) "Saving..." else "Save Event")
             }

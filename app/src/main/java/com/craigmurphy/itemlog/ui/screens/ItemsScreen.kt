@@ -203,6 +203,23 @@ fun ItemsScreen(
 
                                     Text(text = "Price: €${item.price}")
                                     Text(text = "Stock: ${item.quantity}")
+
+                                    when {
+                                        item.quantity == 0 -> {
+                                            Text(
+                                                text = "Sold out",
+                                                color = MaterialTheme.colorScheme.error
+                                            )
+                                        }
+
+                                        item.quantity in 1..3 -> {
+                                            Text(
+                                                text = "⚠ Low stock",
+                                                color = MaterialTheme.colorScheme.error
+                                            )
+                                        }
+                                    }
+
                                     Text(text = "Size: ${item.size ?: "N/A"}")
                                     Text(text = "Description: ${item.description ?: "N/A"}")
 

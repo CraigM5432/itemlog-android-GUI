@@ -18,35 +18,34 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-
 import com.craigmurphy.itemlog.ui.components.EmptyState
 import com.craigmurphy.itemlog.ui.components.EventSummaryCard
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.TransactionsViewModel
 
-// Displays transaction history for the selected event.
-// Transaction data is loaded from the backend API through TransactionsViewModel.
 @Composable
 fun TransactionsScreen(
     eventId: Long
 ) {
     val viewModel: TransactionsViewModel = viewModel()
 
-    // Loads transactions when the screen opens.
     LaunchedEffect(eventId) {
         viewModel.loadTransactions(eventId)
     }
 
     val transactions = viewModel.transactions.value
+    val totalTransactions = transactions.size
+    val totalRevenue = transactions.fold(0.0) { total, transaction ->
+        total + transaction.totalAmount
+    }
+
     val isLoading = viewModel.isLoading.value
     val errorMessage = viewModel.errorMessage.value
     val event = viewModel.event.value
 
     Scaffold(
         topBar = {
-
-            // Reusable screen top bar.
             SimpleTopBar("Transactions")
         }
     ) { innerPadding ->
@@ -57,10 +56,7 @@ fun TransactionsScreen(
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-
-            // Displays selected event details if available.
             event?.let {
-
                 EventSummaryCard(
                     eventName = it.eventName,
                     eventDate = it.eventDate
@@ -69,19 +65,35 @@ fun TransactionsScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // Section title.
-            ScreenHeader("Transactions history")
+            ScreenHeader("Transactions")
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Transaction Summary",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(text = "Total Transactions: $totalTransactions")
+                    Text(text = "Total Revenue: €%.2f".format(totalRevenue))
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             when {
-
-                // Loading state.
                 isLoading -> {
                     Text("Loading transactions history...")
                 }
 
-                // Error state.
                 errorMessage != null -> {
                     Text(
                         text = errorMessage,
@@ -89,7 +101,6 @@ fun TransactionsScreen(
                     )
                 }
 
-                // Empty state if no transactions exist.
                 transactions.isEmpty() -> {
                     EmptyState(
                         title = "No transactions yet",
@@ -98,36 +109,29 @@ fun TransactionsScreen(
                     )
                 }
 
-                // Displays newest recorded sales for the selected event.
                 else -> {
-
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-
                         items(transactions) { transaction ->
 
-                            // Card showing one transaction.
                             Card(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-
                                 Column(
                                     modifier = Modifier.padding(16.dp)
                                 ) {
-
-                                    // Transaction identifier.
                                     Text(
-                                        text = "Transaction #${transaction.transactionId}",
+                                        text = transaction.itemName,
                                         style = MaterialTheme.typography.titleMedium
                                     )
 
                                     Spacer(modifier = Modifier.height(4.dp))
 
-                                    // Transaction details.
-                                    Text(text = "Quantity Sold: ${transaction.quantitySold}")
+                                    Text(text = "Quantity: ${transaction.quantitySold}")
                                     Text(text = "Sale Price: €${transaction.salePrice}")
-                                    Text(text = "Payment Method: ${transaction.paymentMethod}")
+                                    Text(text = "Total: €${transaction.totalAmount}")
+                                    Text(text = "Payment: ${transaction.paymentMethod}")
                                     Text(text = "Time: ${transaction.saleTime}")
                                 }
                             }

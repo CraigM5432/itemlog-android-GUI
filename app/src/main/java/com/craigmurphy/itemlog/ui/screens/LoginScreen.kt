@@ -152,8 +152,8 @@ fun LoginScreen(
                         onLoginClick()
                     }
                 },
-
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !viewModel.isLoading.value
             ) {
 
                 // Changes button text while loading.

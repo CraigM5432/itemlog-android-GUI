@@ -6,5 +6,7 @@ data class TransactionResponse(
     val quantitySold: Int,
     val salePrice: Double,
     val paymentMethod: String,
-    val saleTime: String
+    val saleTime: String,
+    val itemName: String,
+    val totalAmount: Double
 )
