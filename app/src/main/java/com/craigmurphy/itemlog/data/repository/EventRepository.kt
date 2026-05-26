@@ -9,6 +9,7 @@ import com.craigmurphy.itemlog.data.model.ItemResponse
 import com.craigmurphy.itemlog.data.model.TransactionResponse
 import com.craigmurphy.itemlog.network.RetrofitClient
 import retrofit2.HttpException
+import android.util.Log
 
 // Repository responsible for event, item, and transaction API calls.
 // This acts as the data layer between the ViewModels and Retrofit.
@@ -135,7 +136,7 @@ class EventRepository(private val context: Context) {
     ): Result<TransactionResponse> {
 
         return try {
-
+            Log.d("PAYMENT_DEBUG", "Repository paymentMethod = $paymentMethod")
             // Sends POST /events/{eventId}/transactions request.
             val response = RetrofitClient.create(context).createTransaction(
                 eventId = eventId,

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.craigmurphy.itemlog.data.model.ItemResponse
 import com.craigmurphy.itemlog.data.repository.EventRepository
 import kotlinx.coroutines.launch
+import android.util.Log
 
 // ViewModel for recording item sales.
 // Loads available items, validates sale input and sends transaction requests to the backend.
@@ -81,7 +82,7 @@ class RecordSaleViewModel(application: Application) : AndroidViewModel(applicati
                 errorMessage.value = "Not enough stock available."
                 return@launch
             }
-            println("DEBUG PAYMENT METHOD SENT: $paymentMethod")
+            Log.d("PAYMENT_DEBUG", "Payment method sent: $paymentMethod")
             val result = repository.createTransaction(
                 eventId = eventId,
                 itemId = selectedItemId,
