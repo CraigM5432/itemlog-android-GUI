@@ -14,6 +14,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -32,6 +33,14 @@ import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.DeleteItemViewModel
 import com.craigmurphy.itemlog.viewmodel.ItemsViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 
 // Item management screen for a selected event.
 // Allows users to view, add, edit, delete items, record sales, view transactions and export CSV.
@@ -79,6 +88,17 @@ fun ItemsScreen(
     }
 
     val items = viewModel.items.value
+    var searchQuery by remember { mutableStateOf("") }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    val filteredItems = items.filter {
+        it.name.contains(
+            searchQuery,
+            ignoreCase = true
+        )
+    }
+    val totalItems = items.size
+    val totalStock = items.sumOf { it.quantity }
     val isLoading = viewModel.isLoading.value
     val errorMessage = viewModel.errorMessage.value
     val deleteErrorMessage = deleteViewModel.errorMessage.value
@@ -148,7 +168,63 @@ fun ItemsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Inventory Summary",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(text = "Total Item Types: $totalItems")
+                    Text(text = "Total Stock: $totalStock")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             ScreenHeader("Items for this event")
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = {
+                    searchQuery = it
+                },
+                label = {
+                    Text("Search items")
+                },
+                trailingIcon = {
+                    if (searchQuery.isNotBlank()) {
+                        IconButton(
+                            onClick = {
+                                searchQuery = ""
+                                keyboardController?.hide()
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Clear,
+                                contentDescription = "Clear search"
+                            )
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        keyboardController?.hide()
+                    }
+                )
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -180,12 +256,18 @@ fun ItemsScreen(
                         symbol = "📦"
                     )
                 }
-
+                filteredItems.isEmpty() -> {
+                    EmptyState(
+                        title = "No matching items",
+                        message = "Try searching for a different item name.",
+                        symbol = "🔍"
+                    )
+                }
                 else -> {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        items(items) { item ->
+                        items(filteredItems) { item ->
 
                             // Card displaying one item.
                             Card(
@@ -199,29 +281,38 @@ fun ItemsScreen(
                                         style = MaterialTheme.typography.titleMedium
                                     )
 
-                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Spacer(modifier = Modifier.height(6.dp))
 
-                                    Text(text = "Price: €${item.price}")
-                                    Text(text = "Stock: ${item.quantity}")
+                                    Text(
+                                        text = "€${item.price} · Stock: ${item.quantity}",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
 
                                     when {
                                         item.quantity == 0 -> {
                                             Text(
                                                 text = "Sold out",
-                                                color = MaterialTheme.colorScheme.error
+                                                color = MaterialTheme.colorScheme.error,
+                                                style = MaterialTheme.typography.bodyMedium
                                             )
                                         }
 
                                         item.quantity in 1..3 -> {
                                             Text(
                                                 text = "⚠ Low stock",
-                                                color = MaterialTheme.colorScheme.error
+                                                color = MaterialTheme.colorScheme.error,
+                                                style = MaterialTheme.typography.bodyMedium
                                             )
                                         }
                                     }
 
+                                    Spacer(modifier = Modifier.height(4.dp))
+
                                     Text(text = "Size: ${item.size ?: "N/A"}")
-                                    Text(text = "Description: ${item.description ?: "N/A"}")
+
+                                    if (!item.description.isNullOrBlank()) {
+                                        Text(text = item.description)
+                                    }
 
                                     Spacer(modifier = Modifier.height(8.dp))
 

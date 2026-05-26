@@ -9,13 +9,26 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.ui.components.EmptyState
@@ -23,6 +36,8 @@ import com.craigmurphy.itemlog.ui.components.EventSummaryCard
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.TransactionsViewModel
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun TransactionsScreen(
@@ -35,14 +50,28 @@ fun TransactionsScreen(
     }
 
     val transactions = viewModel.transactions.value
-    val totalTransactions = transactions.size
-    val totalRevenue = transactions.fold(0.0) { total, transaction ->
+
+    var searchQuery by remember { mutableStateOf("") }
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    val filteredTransactions = transactions.filter { transaction ->
+        transaction.itemName.contains(searchQuery, ignoreCase = true) ||
+                transaction.paymentMethod.contains(searchQuery, ignoreCase = true)
+    }
+
+    val totalTransactions = filteredTransactions.size
+
+    val totalRevenue = filteredTransactions.fold(0.0) { total, transaction ->
         total + transaction.totalAmount
     }
 
     val isLoading = viewModel.isLoading.value
     val errorMessage = viewModel.errorMessage.value
     val event = viewModel.event.value
+
+    val inputFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+    val outputFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")
 
     Scaffold(
         topBar = {
@@ -89,6 +118,43 @@ fun TransactionsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = {
+                    searchQuery = it
+                },
+                label = {
+                    Text("Search transactions")
+                },
+                trailingIcon = {
+                    if (searchQuery.isNotBlank()) {
+                        IconButton(
+                            onClick = {
+                                searchQuery = ""
+                                keyboardController?.hide()
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Clear,
+                                contentDescription = "Clear search"
+                            )
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        keyboardController?.hide()
+                    }
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             when {
                 isLoading -> {
                     Text("Loading transactions history...")
@@ -109,11 +175,30 @@ fun TransactionsScreen(
                     )
                 }
 
+                filteredTransactions.isEmpty() -> {
+                    EmptyState(
+                        title = "No matching transactions",
+                        message = "Try searching by item name or payment method.",
+                        symbol = "🔍"
+                    )
+                }
+
                 else -> {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        items(transactions) { transaction ->
+                        items(filteredTransactions) { transaction ->
+
+                            val formattedTime = try {
+                                LocalDateTime.parse(transaction.saleTime, inputFormatter)
+                                    .format(outputFormatter)
+                            } catch (e: Exception) {
+                                transaction.saleTime
+                            }
+
+                            val formattedPaymentMethod =
+                                transaction.paymentMethod.lowercase()
+                                    .replaceFirstChar { it.uppercase() }
 
                             Card(
                                 modifier = Modifier.fillMaxWidth()
@@ -131,8 +216,8 @@ fun TransactionsScreen(
                                     Text(text = "Quantity: ${transaction.quantitySold}")
                                     Text(text = "Sale Price: €${transaction.salePrice}")
                                     Text(text = "Total: €${transaction.totalAmount}")
-                                    Text(text = "Payment: ${transaction.paymentMethod}")
-                                    Text(text = "Time: ${transaction.saleTime}")
+                                    Text(text = "Payment: $formattedPaymentMethod")
+                                    Text(text = "Time: $formattedTime")
                                 }
                             }
                         }

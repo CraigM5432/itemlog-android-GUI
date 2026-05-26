@@ -25,6 +25,8 @@ import com.craigmurphy.itemlog.ui.components.EventCard
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.EventsViewModel
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedButton
 
 // Main screen shown after login.
 // Displays all events belonging to the logged-in user.
@@ -43,6 +45,8 @@ fun EventsScreen(
 
     // Snackbar state used for temporary success messages.
     val snackbarHostState = remember { SnackbarHostState() }
+
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     // Reloads events when refreshTrigger changes.
     LaunchedEffect(refreshTrigger) {
@@ -102,7 +106,9 @@ fun EventsScreen(
 
             // Logout button clears token and returns to login.
             TextButton(
-                onClick = onLogoutClick,
+                onClick = {
+                    showLogoutDialog = true
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Logout")
@@ -151,5 +157,37 @@ fun EventsScreen(
                 }
             }
         }
+    }
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showLogoutDialog = false
+            },
+            title = {
+                Text("Log out")
+            },
+            text = {
+                Text("Are you sure you want to log out?")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showLogoutDialog = false
+                        onLogoutClick()
+                    }
+                ) {
+                    Text("Log out")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = {
+                        showLogoutDialog = false
+                    }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }

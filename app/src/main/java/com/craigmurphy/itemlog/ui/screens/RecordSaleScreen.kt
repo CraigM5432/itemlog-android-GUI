@@ -172,7 +172,8 @@ fun RecordSaleScreen(
                 }
             ) {
                 OutlinedTextField(
-                    value = selectedPaymentMethod,
+                    value = selectedPaymentMethod.lowercase()
+                        .replaceFirstChar { it.uppercase() },
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("Payment Method") },
@@ -194,7 +195,11 @@ fun RecordSaleScreen(
                 ) {
                     paymentMethods.forEach { method ->
                         DropdownMenuItem(
-                            text = { Text(method) },
+                            text = {
+                                Text(
+                                    method.lowercase().replaceFirstChar { it.uppercase() }
+                                )
+                            },
                             onClick = {
                                 selectedPaymentMethod = method
                                 paymentDropdownExpanded = false
