@@ -127,6 +127,7 @@ fun TransactionsScreen(
                                     // Transaction details.
                                     Text(text = "Quantity Sold: ${transaction.quantitySold}")
                                     Text(text = "Sale Price: €${transaction.salePrice}")
+                                    Text(text = "Payment Method: ${transaction.paymentMethod}")
                                     Text(text = "Time: ${transaction.saleTime}")
                                 }
                             }
