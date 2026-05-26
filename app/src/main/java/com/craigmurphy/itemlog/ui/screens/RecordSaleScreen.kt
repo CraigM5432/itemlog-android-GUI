@@ -28,7 +28,6 @@ import com.craigmurphy.itemlog.viewmodel.RecordSaleViewModel
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import android.util.Log
 
 // Screen used to record merchandise sales for the selected event.
 // Users select an item, enter quantity sold and optionally adjust sale price.
@@ -218,8 +217,6 @@ fun RecordSaleScreen(
             // Backend also validates stock quantity to prevent overselling.
             Button(
                 onClick = {
-                    println("PAYMENT_DEBUG Screen selectedPaymentMethod = $selectedPaymentMethod")
-                    Log.d("PAYMENT_DEBUG", "Screen selectedPaymentMethod = $selectedPaymentMethod")
                     viewModel.createTransaction(
                         eventId = eventId,
                         selectedItemId = selectedItem?.itemId,
