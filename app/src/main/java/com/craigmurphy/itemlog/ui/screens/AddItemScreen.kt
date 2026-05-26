@@ -23,6 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.AddItemViewModel
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 
 // Screen for adding a new merchandise item to the selected event.
 @Composable
@@ -36,6 +37,7 @@ fun AddItemScreen(
     var quantity by remember { mutableStateOf("") }
     var size by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     // ViewModel handles validation and API call.
     val viewModel: AddItemViewModel = viewModel()
@@ -122,6 +124,7 @@ fun AddItemScreen(
             // Creates the item.
             Button(
                 onClick = {
+                    keyboardController?.hide()
                     viewModel.createItem(
                         eventId = eventId,
                         name = itemName,

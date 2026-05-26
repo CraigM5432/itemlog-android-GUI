@@ -24,6 +24,7 @@ import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.EditItemViewModel
 import java.net.URLDecoder
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 
 // Screen for editing an existing merchandise item.
 // Existing item values are passed through navigation arguments.
@@ -46,6 +47,7 @@ fun EditItemScreen(
     var quantity by remember { mutableStateOf(initialQuantity) }
     var size by remember { mutableStateOf(URLDecoder.decode(initialSize, "UTF-8")) }
     var description by remember { mutableStateOf(URLDecoder.decode(initialDescription, "UTF-8")) }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     // ViewModel handles validation and update API call.
     val viewModel: EditItemViewModel = viewModel()
@@ -132,6 +134,7 @@ fun EditItemScreen(
             // Saves item changes.
             Button(
                 onClick = {
+                    keyboardController?.hide()
                     viewModel.updateItem(
                         eventId = eventId,
                         itemId = itemId,

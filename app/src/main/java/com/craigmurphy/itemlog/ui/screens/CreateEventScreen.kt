@@ -21,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.craigmurphy.itemlog.ui.components.ScreenHeader
 import com.craigmurphy.itemlog.ui.components.SimpleTopBar
 import com.craigmurphy.itemlog.viewmodel.CreateEventViewModel
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 
 // Screen used to create a new event.
 @Composable
@@ -33,6 +34,8 @@ fun CreateEventScreen(
 
     // Stores event date typed by the user.
     var eventDate by remember { mutableStateOf("") }
+
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     // ViewModel responsible for validation and API call.
     val viewModel: CreateEventViewModel = viewModel()
@@ -87,6 +90,7 @@ fun CreateEventScreen(
             // Saves the event by calling the ViewModel.
             Button(
                 onClick = {
+                    keyboardController?.hide()
                     viewModel.createEvent(eventName, eventDate) {
                         onSaveClick()
                     }

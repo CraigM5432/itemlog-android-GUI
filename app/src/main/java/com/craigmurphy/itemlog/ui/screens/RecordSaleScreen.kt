@@ -28,6 +28,7 @@ import com.craigmurphy.itemlog.viewmodel.RecordSaleViewModel
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 
 // Screen used to record merchandise sales for the selected event.
 // Users select an item, enter quantity sold and optionally adjust sale price.
@@ -51,6 +52,7 @@ fun RecordSaleScreen(
     var paymentDropdownExpanded by remember { mutableStateOf(false) }
 
     val paymentMethods = listOf("CASH", "CARD", "REVOLUT")
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     // Controls whether the dropdown menu is open.
     var expanded by remember { mutableStateOf(false) }
@@ -217,6 +219,7 @@ fun RecordSaleScreen(
             // Backend also validates stock quantity to prevent overselling.
             Button(
                 onClick = {
+                    keyboardController?.hide()
                     viewModel.createTransaction(
                         eventId = eventId,
                         selectedItemId = selectedItem?.itemId,
